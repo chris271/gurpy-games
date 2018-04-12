@@ -1,7 +1,9 @@
 package com.gurpy.games.pojos.action;
 
-import java.util.ArrayList;
+import com.gurpy.games.pojos.entities.Entity;
 
 public interface Action {
-    public void perform(String operation, ArrayList<Object> operands);
+    public Entity getOwner();
+    public void setOwner(Entity owner);
+    public boolean perform();
 }

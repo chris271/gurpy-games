@@ -1,6 +1,7 @@
 package com.gurpy.games.core;
 
 import com.gurpy.games.gui.GurpusUI;
+import com.gurpy.games.pojos.component.PhysicsComponent;
 import com.gurpy.games.pojos.entities.UIElement;
 import com.gurpy.games.pojos.entities.UIEntity;
 import com.gurpy.games.utils.Logger;
@@ -14,9 +15,11 @@ public class GurpusCore implements Runnable{
     private final static String OS = System.getProperty("os.name").toLowerCase();
     private boolean actionFlag = false;
     private boolean actionCompleteFlag = false;
+    private PhysicsComponent physicsComponent;
 
     public GurpusCore(GurpusUI contentPane) {
         this.contentPane = contentPane;
+        this.physicsComponent = new PhysicsComponent();
     }
 
     public void run() {
@@ -48,7 +51,7 @@ public class GurpusCore implements Runnable{
         try {
             //Use resources...
         } catch (Exception e) {
-            Logger.debug("Error: Unexpected Exception has occured");
+            Logger.debug("Error: Unexpected Exception has occurred.");
             e.printStackTrace();
         } finally {
             //Close resources...
@@ -60,10 +63,12 @@ public class GurpusCore implements Runnable{
     private void updateCurrentGUIState() {
         //Iterate over each element.
         for (UIEntity e : contentPane.getGuiElements()) {
-            if (!contentPane.isShowing()) {
-                Logger.error("Cannot find GUI!");
-                System.exit(0);
-            }
+
+        }
+
+        if (!contentPane.isShowing()) {
+            Logger.error("Cannot find GUI!");
+            System.exit(0);
         }
     }
 

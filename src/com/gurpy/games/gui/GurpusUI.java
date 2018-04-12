@@ -1,9 +1,12 @@
 package com.gurpy.games.gui;
 
+import com.gurpy.games.pojos.action.DrawAction;
+import com.gurpy.games.pojos.action.UIAction;
+import com.gurpy.games.pojos.component.RenderingComponent;
 import com.gurpy.games.pojos.control.TextAreaOutputStream;
+import com.gurpy.games.pojos.control.UIMouseListener;
 import com.gurpy.games.pojos.entities.EntityTypes;
-import com.gurpy.games.pojos.entities.UIElement;
-import com.gurpy.games.pojos.control.UIMouseAdapter;
+import com.gurpy.games.pojos.entities.Player;
 import com.gurpy.games.pojos.entities.UIEntity;
 import com.gurpy.games.utils.Logger;
 
@@ -12,6 +15,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.geom.Point2D;
 import java.io.PrintStream;
 import java.util.ArrayList;
 
@@ -20,8 +24,10 @@ public class GurpusUI extends JPanel{
     private final double SCALING = 1.0;
     private ArrayList<UIEntity> guiElements = new ArrayList<>();
     private ArrayList<Integer> keyCodes = new ArrayList<>();
-    private UIMouseAdapter uiMouseAdapter;
-    private final Dimension SCREEN_SIZE = Toolkit.getDefaultToolkit().getScreenSize();
+    private UIMouseListener uiMouseListener;
+    private RenderingComponent renderingComponent;
+    public final Dimension SCREEN_SIZE = Toolkit.getDefaultToolkit().getScreenSize();
+    public final Dimension PANEL_SIZE = new Dimension(600, 600);
 
     /**
      * Custom constructor for OSPanel Object.
@@ -32,17 +38,21 @@ public class GurpusUI extends JPanel{
      */
     public GurpusUI() {
         //Self explanatory
-        this.setBackground(Color.BLACK);
-        this.setPreferredSize(SCREEN_SIZE);
+        this.setBackground(Color.WHITE);
+        this.setPreferredSize(PANEL_SIZE);
         this.setDoubleBuffered(true);
 
-        //Add custom MouseListener using MouseAdapter.
-        uiMouseAdapter = new UIMouseAdapter();
-        addMouseListener(uiMouseAdapter);
+        //Add custom MouseListeners.
+        uiMouseListener = new UIMouseListener();
+        addMouseListener(uiMouseListener);
+        addMouseMotionListener(uiMouseListener);
+        addMouseWheelListener(uiMouseListener);
 
         //KeyListeners only work on focused windows.
         this.setFocusable(true);
         this.requestFocusInWindow();
+
+        //addConsoleToGUI(); For debugging purposes...
 
         //Anonymous class for KeyListener.
         addKeyListener(new KeyListener() {
@@ -64,6 +74,12 @@ public class GurpusUI extends JPanel{
                 //Must be implemented to satisfy KeyListener.
             }
         });
+
+        renderingComponent = new RenderingComponent();
+        addGuiElement(new Player(
+                new Point2D.Double(PANEL_SIZE.getWidth() / 2, PANEL_SIZE.getHeight() / 2),
+                new Dimension(100, 100)));
+
     }
 
     @Override
@@ -77,55 +93,43 @@ public class GurpusUI extends JPanel{
         g2d.setRenderingHints(renderingHints);
         super.paintComponent(g2d);
         //Iterate over the GUI in order to repaint changes.
-        checkUIElements(g2d);
+        //Iterate through each UIElement.
+        for (UIEntity uiEntity : guiElements) {
+            renderingComponent.performAction(new DrawAction(uiEntity, g2d));
+        }
         //Effectively recalls paintComponent(g);
         repaint();
     }
 
-    /**
-     * Method will iteratively draw all UIElements and print any font.
-     */
-    private void checkUIElements(Graphics g){
-        //Press q or escape to exit simulation.
-        if (keyCodes.contains(KeyEvent.VK_ESCAPE) || keyCodes.contains(KeyEvent.VK_Q)) {
-            Logger.info("Exiting Simulation...");
-            System.exit(1);
-        }
-
-        //Draw the title with Large Bold Blue Text.
-        g.setFont(new Font("Large Font", Font.BOLD, 32));
-        g.setColor(Color.BLUE);
-        g.drawString("Java AWS S3 File Verifier.", 190, 50);
-
-        //Iterate through each UIElement.
-        for (UIEntity uiEntity : guiElements) {
-            //Perform mouse updates on buttons only.
-            if (uiEntity.getType() != EntityTypes.PLAYER) {
-                performMouseUpdates(uiEntity);
-            }
-        }
-    }
-
-    private void performMouseUpdates(UIEntity guiElement){
-        //Check to see if the mouse is clicked inside of the bounding box of an element and set clicked.
-        /*if(uiMouseAdapter.getXDown() > guiElement.getX() &&
-                uiMouseAdapter.getYDown() > guiElement.getY() &&
-                uiMouseAdapter.getXDown() < guiElement.getX() + guiElement.getWidth() &&
-                uiMouseAdapter.getYDown() < guiElement.getY() + guiElement.getHeight()){
-
-        } else {
-            guiElement.setClicked(false);
-        }*/
-    }
-
-    /**
-     * Gives access to guiElements to other class.
-     */
-    public ArrayList<UIEntity> getGuiElements(){
+    public ArrayList<UIEntity> getGuiElements() {
         return guiElements;
     }
 
-    public void addConsoleToGUI() {
+    public void addGuiElement(UIEntity uiEntity) {
+        guiElements.add(uiEntity);
+    }
+
+    public ArrayList<Integer> getKeyCodes(){
+        return keyCodes;
+    }
+
+    public double getMouseX(){
+        return uiMouseListener.getxPos();
+    }
+
+    public double getMouseY(){
+        return uiMouseListener.getyPos();
+    }
+
+    public double getMouseClickX(){
+        return uiMouseListener.getxPress();
+    }
+
+    public double getMouseClickY(){
+        return uiMouseListener.getyPress();
+    }
+
+    private void addConsoleToGUI() {
         //Adds a text area with 20 rows and 20 cols.
         JTextArea textArea = new JTextArea(20, 20);
         //Set up the custom OutputStream attached to the textArea and title it.

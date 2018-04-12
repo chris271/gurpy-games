@@ -7,12 +7,31 @@ import java.awt.geom.Point2D;
 
 public class Enemy extends BBoxElement {
 
-    public Enemy(Point2D position, Dimension dimension) {
-        super(position, dimension, EntityTypes.PLAYER);
+    /**
+     * Constructor for custom color box enemy.
+     * @param position
+     * @param dimension
+     */
+    public Enemy(Point2D position, Dimension dimension, Color borderColor, Color bgColor) {
+        super(position, dimension, borderColor, bgColor, EntityTypes.PLAYER);
     }
 
-    @Override
-    public void performAction(Action action) {
-        //Generic enemy action
+    /**
+     * Constructor for solid color box enemy.
+     * @param position
+     * @param dimension
+     */
+    public Enemy(Point2D position, Dimension dimension, Color color) {
+        super(position, dimension, color, color, EntityTypes.PLAYER);
     }
+
+    /**
+     * Constructor for default box enemy.
+     * @param position
+     * @param dimension
+     */
+    public Enemy(Point2D position, Dimension dimension) {
+        super(position, dimension, Color.BLACK, Color.WHITE, EntityTypes.PLAYER);
+    }
+
 }
