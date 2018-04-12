@@ -29,10 +29,10 @@ public class DrawAction extends UIAction {
             //Draw background as a filled rectangle inside of the border rectangle.
             g2d.setColor(boxElem.getBgColor());
             g2d.fill(new Rectangle2D.Double(
-                    boxElem.getX() + 1,
-                    boxElem.getY() + 1,
-                    boxElem.getWidth() - 2,
-                    boxElem.getHeight() - 2));
+                    boxElem.getX() + boxElem.getBorderThickness(),
+                    boxElem.getY() + boxElem.getBorderThickness(),
+                    boxElem.getWidth() - 2 * boxElem.getBorderThickness(),
+                    boxElem.getHeight() - 2 * boxElem.getBorderThickness()));
             return true;
         } else {
             return false;

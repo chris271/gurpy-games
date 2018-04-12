@@ -77,8 +77,11 @@ public class GurpusUI extends JPanel{
 
         renderingComponent = new RenderingComponent();
         addGuiElement(new Player(
-                new Point2D.Double(PANEL_SIZE.getWidth() / 2, PANEL_SIZE.getHeight() / 2),
-                new Dimension(100, 100)));
+                new Point2D.Double(PANEL_SIZE.getWidth() / 2 - 50, PANEL_SIZE.getHeight() / 2 - 50),
+                new Dimension(100, 100),
+                Color.BLACK,
+                Color.WHITE,
+                10.0));
 
     }
 

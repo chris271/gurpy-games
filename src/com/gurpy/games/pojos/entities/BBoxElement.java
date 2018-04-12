@@ -17,8 +17,8 @@ public class BBoxElement extends UIElement {
      * @param bgColor
      * @param type
      */
-    public BBoxElement(Point2D position, Dimension dimension, Color borderColor, Color bgColor, int type) {
-        super(position, borderColor, bgColor, type);
+    public BBoxElement(Point2D position, Dimension dimension, Color borderColor, Color bgColor, double borderThickness, int type) {
+        super(position, borderColor, bgColor, borderThickness, type);
         this.width = dimension.getWidth();
         this.height = dimension.getHeight();
     }
@@ -30,8 +30,8 @@ public class BBoxElement extends UIElement {
      * @param borderColor
      * @param bgColor
      */
-    public BBoxElement(Point2D position, Dimension dimension, Color borderColor, Color bgColor) {
-        super(position, borderColor, bgColor, EntityTypes.BACKGROUND);
+    public BBoxElement(Point2D position, Dimension dimension, Color borderColor, Color bgColor, double borderThickness) {
+        super(position, borderColor, bgColor, borderThickness, EntityTypes.BACKGROUND);
         this.width = dimension.getWidth();
         this.height = dimension.getHeight();
     }

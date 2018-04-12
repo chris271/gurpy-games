@@ -15,6 +15,7 @@ public abstract class UIElement implements UIEntity{
     private int type;
     private Color borderColor;
     private Color bgColor;
+    private double borderThickness;
 
     /**
      * Contructor used for custom UI element.
@@ -23,13 +24,13 @@ public abstract class UIElement implements UIEntity{
      * @param bgColor
      * @param type
      */
-    UIElement(Point2D position, Color borderColor, Color bgColor, int type){
-        this.xLoc = xLoc;
-        this.yLoc = yLoc;
+    UIElement(Point2D position, Color borderColor, Color bgColor, double borderThickness, int type){
+        this.xLoc = position.getX();
+        this.yLoc = position.getY();
         this.borderColor = borderColor;
         this.bgColor = bgColor;
         this.type = type;
-
+        this.borderThickness = borderThickness;
     }
 
     /**
@@ -39,12 +40,12 @@ public abstract class UIElement implements UIEntity{
      * @param type
      */
     UIElement(Point2D position, Color color, int type){
-        this.xLoc = xLoc;
-        this.yLoc = yLoc;
+        this.xLoc = position.getX();
+        this.yLoc = position.getY();
         this.borderColor = color;
         this.bgColor = color;
         this.type = type;
-
+        this.borderThickness = 0.0;
     }
 
     /**
@@ -53,12 +54,12 @@ public abstract class UIElement implements UIEntity{
      * @param type
      */
     UIElement(Point2D position, int type){
-        this.xLoc = xLoc;
-        this.yLoc = yLoc;
+        this.xLoc = position.getX();
+        this.yLoc = position.getY();
         this.borderColor = Color.BLACK;
         this.bgColor = Color.BLACK;
         this.type = type;
-
+        this.borderThickness = 0.0;
     }
 
     /**
@@ -71,6 +72,7 @@ public abstract class UIElement implements UIEntity{
         this.borderColor = Color.BLACK;
         this.bgColor = Color.BLACK;
         type = EntityTypes.DEFAULT;
+        this.borderThickness = 0.0;
     }
 
     @Override
@@ -133,5 +135,13 @@ public abstract class UIElement implements UIEntity{
 
     public void setBgColor(Color bgColor) {
         this.bgColor = bgColor;
+    }
+
+    public double getBorderThickness() {
+        return borderThickness;
+    }
+
+    public void setBorderThickness(double borderThickness) {
+        this.borderThickness = borderThickness;
     }
 }

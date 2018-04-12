@@ -13,8 +13,8 @@ public class Player extends BBoxElement {
      * @param position
      * @param dimension
      */
-    public Player(Point2D position, Dimension dimension, Color borderColor, Color bgColor) {
-        super(position, dimension, borderColor, bgColor, EntityTypes.PLAYER);
+    public Player(Point2D position, Dimension dimension, Color borderColor, Color bgColor, double borderThickness) {
+        super(position, dimension, borderColor, bgColor, borderThickness, EntityTypes.PLAYER);
     }
 
     /**
@@ -23,7 +23,7 @@ public class Player extends BBoxElement {
      * @param dimension
      */
     public Player(Point2D position, Dimension dimension, Color color) {
-        super(position, dimension, color, color, EntityTypes.PLAYER);
+        super(position, dimension, color, color, 0.0, EntityTypes.PLAYER);
     }
 
     /**
@@ -32,7 +32,7 @@ public class Player extends BBoxElement {
      * @param dimension
      */
     public Player(Point2D position, Dimension dimension) {
-        super(position, dimension, Color.BLACK, Color.WHITE, EntityTypes.PLAYER);
+        super(position, dimension, Color.BLACK, Color.WHITE, 2.0, EntityTypes.PLAYER);
     }
 
 }
