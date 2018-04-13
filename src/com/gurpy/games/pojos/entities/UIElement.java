@@ -16,6 +16,7 @@ public abstract class UIElement implements UIEntity{
     private Color borderColor;
     private Color bgColor;
     private double borderThickness;
+    private boolean display;
 
     /**
      * Contructor used for custom UI element.
@@ -121,6 +122,16 @@ public abstract class UIElement implements UIEntity{
         yLoc = position.getY();
     }
 
+    @Override
+    public boolean isDisplay() {
+        return display;
+    }
+
+    @Override
+    public void setDisplay(boolean display) {
+        this.display = display;
+    }
+
     public Color getBorderColor() {
         return borderColor;
     }
@@ -144,4 +155,5 @@ public abstract class UIElement implements UIEntity{
     public void setBorderThickness(double borderThickness) {
         this.borderThickness = borderThickness;
     }
+
 }

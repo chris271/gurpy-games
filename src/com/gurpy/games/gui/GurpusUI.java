@@ -6,6 +6,8 @@ import com.gurpy.games.pojos.component.RenderingComponent;
 import com.gurpy.games.pojos.control.TextAreaOutputStream;
 import com.gurpy.games.pojos.control.UIMouseListener;
 import com.gurpy.games.pojos.entities.EntityTypes;
+import com.gurpy.games.pojos.entities.Menu;
+import com.gurpy.games.pojos.entities.MenuItem;
 import com.gurpy.games.pojos.entities.Player;
 import com.gurpy.games.pojos.entities.TextElement;
 import com.gurpy.games.pojos.entities.UIEntity;
@@ -19,20 +21,19 @@ import java.awt.event.KeyListener;
 import java.awt.geom.Point2D;
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class GurpusUI extends JPanel{
     //Allow for easy scaling of UIElements.
-    private final double SCALING = 1.0;
+    private final int SCALING = 1;
     private int fps = 0;
     private int numFramesInSecond = 0;
     private long lastFrameTime = 0;
-    private long currentFrameTime = 0;
-    private ArrayList<UIEntity> guiElements = new ArrayList<>();
-    private ArrayList<Integer> keyCodes = new ArrayList<>();
+    private CopyOnWriteArrayList<UIEntity> guiElements = new CopyOnWriteArrayList<>();
+    private CopyOnWriteArrayList<Integer> keyCodes = new CopyOnWriteArrayList<>();
     private UIMouseListener uiMouseListener;
     private RenderingComponent renderingComponent;
     public final Dimension SCREEN_SIZE = Toolkit.getDefaultToolkit().getScreenSize();
-    public final Dimension PANEL_SIZE = new Dimension(600, 600);
 
     /**
      * Custom constructor for OSPanel Object.
@@ -43,8 +44,8 @@ public class GurpusUI extends JPanel{
      */
     public GurpusUI() {
         //Self explanatory
-        this.setBackground(Color.WHITE);
-        this.setPreferredSize(PANEL_SIZE);
+        this.setBackground(Color.BLACK);
+        this.setPreferredSize(new Dimension(600, 600));
         this.setDoubleBuffered(true);
 
         //Add custom MouseListeners.
@@ -63,15 +64,12 @@ public class GurpusUI extends JPanel{
         addKeyListener(new KeyListener() {
             @Override
             public void keyPressed(KeyEvent e) {
-                //Add the key to check if it is one of the escape keys ("q" and "esc").
-                keyCodes.add(e.getKeyCode());
+                keyCodes.addIfAbsent(e.getKeyCode());
             }
 
             @Override
             public void keyReleased(KeyEvent e) {
-                //Sometimes multiple instances of the keycode get added so remove all.
-                while(keyCodes.contains(e.getKeyCode()))
-                    keyCodes.remove(keyCodes.indexOf(e.getKeyCode()));
+                keyCodes.remove(keyCodes.indexOf(e.getKeyCode()));
             }
 
             @Override
@@ -81,19 +79,58 @@ public class GurpusUI extends JPanel{
         });
 
         renderingComponent = new RenderingComponent();
-        addGuiElement(new Player(
-                new Point2D.Double(PANEL_SIZE.getWidth() / 2 - 50, PANEL_SIZE.getHeight() / 2 - 50),
-                new Dimension(100, 100),
-                Color.BLACK,
-                Color.WHITE,
-                10.0,
-                .1));
-        addGuiElement(new TextElement(
+        TextElement fpsCounter = new TextElement(
                 new Point2D.Double(10, 20),
                 Color.BLACK,
                 Color.RED,
                 "FPS: 0",
-                10.0));
+                10.0);
+        fpsCounter.setDisplay(true);
+        addGuiElement(fpsCounter);
+
+        CopyOnWriteArrayList<MenuItem> menuItems = new CopyOnWriteArrayList<>();
+        menuItems.add(new MenuItem(
+                new Point2D.Double(getPreferredSize().getWidth() / 2 - 200 * SCALING, getPreferredSize().getHeight() / 4),
+                new Dimension(400 * SCALING, 50 * SCALING),
+                Color.WHITE,
+                Color.RED,
+                "Play Game",
+                5.0));
+        menuItems.add(new MenuItem(
+                new Point2D.Double(getPreferredSize().getWidth() / 2 - 200 * SCALING, getPreferredSize().getHeight() / 4 + 100),
+                new Dimension(400 * SCALING, 50 * SCALING),
+                Color.WHITE,
+                Color.RED,
+                "Options",
+                5.0));
+        menuItems.add(new MenuItem(
+                new Point2D.Double(getPreferredSize().getWidth() / 2 - 200 * SCALING, getPreferredSize().getHeight() / 4 + 200),
+                new Dimension(400 * SCALING, 50 * SCALING),
+                Color.WHITE,
+                Color.RED,
+                "Controls",
+                5.0));
+        menuItems.add(new MenuItem(
+                new Point2D.Double(getPreferredSize().getWidth() / 2 - 200 * SCALING, getPreferredSize().getHeight() / 4 + 300),
+                new Dimension(400 * SCALING, 50 * SCALING),
+                Color.WHITE,
+                Color.RED,
+                "Exit Game",
+                5.0));
+        TextElement menuTitle = new TextElement(
+                new Point2D.Double(getPreferredSize().getWidth() / 3, getPreferredSize().getHeight() / 8),
+                Color.WHITE,
+                Color.BLACK,
+                "Gurpus Maximus",
+                24);
+        addGuiElement(new Menu(menuTitle, menuItems, true));
+        addGuiElement(new Player(
+                new Point2D.Double(getPreferredSize().getWidth() / 2 - 50, getPreferredSize().getHeight() / 2 - 50),
+                new Dimension(100 * SCALING, 100 * SCALING),
+                Color.BLACK,
+                Color.WHITE,
+                10.0,
+                .1));
 
         lastFrameTime = System.currentTimeMillis();
 
@@ -112,7 +149,8 @@ public class GurpusUI extends JPanel{
         //Iterate over the GUI in order to repaint changes.
         //Iterate through each UIElement.
         for (UIEntity uiEntity : guiElements) {
-            renderingComponent.performAction(new DrawAction(uiEntity, g2d));
+            if (uiEntity.isDisplay())
+                renderingComponent.performAction(new DrawAction(uiEntity, g2d));
         }
 
         //Method to update current FPS.
@@ -121,7 +159,7 @@ public class GurpusUI extends JPanel{
         repaint();
     }
 
-    public ArrayList<UIEntity> getGuiElements() {
+    public CopyOnWriteArrayList<UIEntity> getGuiElements() {
         return guiElements;
     }
 
@@ -129,7 +167,7 @@ public class GurpusUI extends JPanel{
         guiElements.add(uiEntity);
     }
 
-    public ArrayList<Integer> getKeyCodes(){
+    public CopyOnWriteArrayList<Integer> getKeyCodes(){
         return keyCodes;
     }
 
@@ -168,7 +206,7 @@ public class GurpusUI extends JPanel{
     }
 
     private void checkFPS(Graphics2D g2d) {
-        currentFrameTime = System.currentTimeMillis();
+        long currentFrameTime = System.currentTimeMillis();
         numFramesInSecond++;
         if (currentFrameTime - lastFrameTime >= 1000) {
             fps = numFramesInSecond;

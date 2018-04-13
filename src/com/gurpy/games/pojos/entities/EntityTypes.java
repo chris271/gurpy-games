@@ -8,4 +8,6 @@ public final class EntityTypes {
     public static final int BACKGROUND = 4;
     public static final int WALL = 5;
     public static final int TEXT = 6;
+    public static final int MENU_ITEM = 7;
+    public static final int MENU = 8;
 }

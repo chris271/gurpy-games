@@ -18,7 +18,8 @@ public final class UIMouseListener implements MouseListener, MouseMotionListener
 
     @Override
     public void mouseReleased(MouseEvent e) {
-        //Not implemented...
+        xPress = -1;
+        yPress = -1;
     }
 
     @Override

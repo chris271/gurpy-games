@@ -13,5 +13,7 @@ public interface UIEntity extends Entity{
     public void addToX(double x);
     public void addToY(double y);
     public void setPosition(Point2D position);
+    public void setDisplay(boolean display);
+    public boolean isDisplay();
 
 }
