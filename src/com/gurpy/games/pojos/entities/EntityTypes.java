@@ -7,4 +7,5 @@ public final class EntityTypes {
     public static final int CONTROL = 3;
     public static final int BACKGROUND = 4;
     public static final int WALL = 5;
+    public static final int TEXT = 6;
 }

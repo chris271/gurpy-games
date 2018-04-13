@@ -28,6 +28,7 @@ public class Main {
                 frame.setContentPane(contentPane);
                 Logger.info("GUI Running.");
                 frame.pack();
+                frame.requestFocus();
                 frame.setVisible(true);
             }
         });

@@ -1,12 +1,18 @@
 package com.gurpy.games.core;
 
 import com.gurpy.games.gui.GurpusUI;
+import com.gurpy.games.pojos.action.Action;
+import com.gurpy.games.pojos.action.TranslationAction;
 import com.gurpy.games.pojos.component.PhysicsComponent;
+import com.gurpy.games.pojos.entities.Player;
+import com.gurpy.games.pojos.entities.TextElement;
 import com.gurpy.games.pojos.entities.UIElement;
 import com.gurpy.games.pojos.entities.UIEntity;
 import com.gurpy.games.utils.Logger;
 
 import javax.swing.*;
+import java.awt.event.KeyEvent;
+import java.awt.geom.Point2D;
 import java.io.IOException;
 
 public class GurpusCore implements Runnable{
@@ -16,6 +22,7 @@ public class GurpusCore implements Runnable{
     private boolean actionFlag = false;
     private boolean actionCompleteFlag = false;
     private PhysicsComponent physicsComponent;
+    private Action currentAction;
 
     public GurpusCore(GurpusUI contentPane) {
         this.contentPane = contentPane;
@@ -29,7 +36,7 @@ public class GurpusCore implements Runnable{
             updateCurrentGUIState();
             if(actionFlag) {
                 try {
-                    actionCompleteFlag = actionMethod("");
+                    actionCompleteFlag = performForResult(currentAction);
                     if (actionCompleteFlag) {
                         Logger.info("Action Completed!");
                     }
@@ -45,7 +52,7 @@ public class GurpusCore implements Runnable{
         System.exit(1);
     }
 
-    public boolean actionMethod(String params) throws IOException {
+    private boolean performForResult(Action action) throws IOException {
 
         //Define resources...
         try {
@@ -63,7 +70,31 @@ public class GurpusCore implements Runnable{
     private void updateCurrentGUIState() {
         //Iterate over each element.
         for (UIEntity e : contentPane.getGuiElements()) {
-
+            if (e instanceof Player) {
+                Player player = (Player) e;
+                if (contentPane.getKeyCodes().contains(KeyEvent.VK_LEFT)) {
+                    physicsComponent.performAction(new TranslationAction(player,
+                            new Point2D.Double(player.getX() - player.getHspeed(), player.getY())));
+                }
+                if (contentPane.getKeyCodes().contains(KeyEvent.VK_RIGHT)) {
+                    physicsComponent.performAction(new TranslationAction(player,
+                            new Point2D.Double(player.getX() + player.getHspeed(), player.getY())));
+                }
+                if (contentPane.getKeyCodes().contains(KeyEvent.VK_UP)) {
+                    physicsComponent.performAction(new TranslationAction(player,
+                            new Point2D.Double(player.getX(), player.getY() - player.getVspeed())));
+                }
+                if (contentPane.getKeyCodes().contains(KeyEvent.VK_DOWN)) {
+                    physicsComponent.performAction(new TranslationAction(player,
+                            new Point2D.Double(player.getX(), player.getY() + player.getVspeed())));
+                }
+            }
+            if (e instanceof TextElement) {
+                TextElement textElement = (TextElement)e;
+                if (textElement.getText().contains("FPS")) {
+                    textElement.setText("FPS: " + contentPane.getFps());
+                }
+            }
         }
 
         if (!contentPane.isShowing()) {

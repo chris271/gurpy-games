@@ -7,6 +7,7 @@ import com.gurpy.games.pojos.control.TextAreaOutputStream;
 import com.gurpy.games.pojos.control.UIMouseListener;
 import com.gurpy.games.pojos.entities.EntityTypes;
 import com.gurpy.games.pojos.entities.Player;
+import com.gurpy.games.pojos.entities.TextElement;
 import com.gurpy.games.pojos.entities.UIEntity;
 import com.gurpy.games.utils.Logger;
 
@@ -22,6 +23,10 @@ import java.util.ArrayList;
 public class GurpusUI extends JPanel{
     //Allow for easy scaling of UIElements.
     private final double SCALING = 1.0;
+    private int fps = 0;
+    private int numFramesInSecond = 0;
+    private long lastFrameTime = 0;
+    private long currentFrameTime = 0;
     private ArrayList<UIEntity> guiElements = new ArrayList<>();
     private ArrayList<Integer> keyCodes = new ArrayList<>();
     private UIMouseListener uiMouseListener;
@@ -52,7 +57,7 @@ public class GurpusUI extends JPanel{
         this.setFocusable(true);
         this.requestFocusInWindow();
 
-        //addConsoleToGUI(); For debugging purposes...
+        //addConsoleToGUI(); //For debugging purposes...
 
         //Anonymous class for KeyListener.
         addKeyListener(new KeyListener() {
@@ -81,7 +86,16 @@ public class GurpusUI extends JPanel{
                 new Dimension(100, 100),
                 Color.BLACK,
                 Color.WHITE,
+                10.0,
+                .1));
+        addGuiElement(new TextElement(
+                new Point2D.Double(10, 20),
+                Color.BLACK,
+                Color.RED,
+                "FPS: 0",
                 10.0));
+
+        lastFrameTime = System.currentTimeMillis();
 
     }
 
@@ -100,6 +114,9 @@ public class GurpusUI extends JPanel{
         for (UIEntity uiEntity : guiElements) {
             renderingComponent.performAction(new DrawAction(uiEntity, g2d));
         }
+
+        //Method to update current FPS.
+        checkFPS(g2d);
         //Effectively recalls paintComponent(g);
         repaint();
     }
@@ -132,6 +149,10 @@ public class GurpusUI extends JPanel{
         return uiMouseListener.getyPress();
     }
 
+    public int getFps() {
+        return fps;
+    }
+
     private void addConsoleToGUI() {
         //Adds a text area with 20 rows and 20 cols.
         JTextArea textArea = new JTextArea(20, 20);
@@ -144,6 +165,16 @@ public class GurpusUI extends JPanel{
                 JScrollPane.HORIZONTAL_SCROLLBAR_NEVER), BorderLayout.SOUTH);
         //Hijack System.out console and add it to the GUI.
         System.setOut(new PrintStream(guiOutputStream));
+    }
+
+    private void checkFPS(Graphics2D g2d) {
+        currentFrameTime = System.currentTimeMillis();
+        numFramesInSecond++;
+        if (currentFrameTime - lastFrameTime >= 1000) {
+            fps = numFramesInSecond;
+            lastFrameTime = currentFrameTime;
+            numFramesInSecond = 0;
+        }
     }
 
 }
