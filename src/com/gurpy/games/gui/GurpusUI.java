@@ -1,17 +1,13 @@
 package com.gurpy.games.gui;
 
 import com.gurpy.games.pojos.action.DrawAction;
-import com.gurpy.games.pojos.action.UIAction;
 import com.gurpy.games.pojos.component.RenderingComponent;
-import com.gurpy.games.pojos.control.TextAreaOutputStream;
 import com.gurpy.games.pojos.control.UIMouseListener;
-import com.gurpy.games.pojos.entities.EntityTypes;
 import com.gurpy.games.pojos.entities.Menu;
 import com.gurpy.games.pojos.entities.MenuItem;
 import com.gurpy.games.pojos.entities.Player;
 import com.gurpy.games.pojos.entities.TextElement;
 import com.gurpy.games.pojos.entities.UIEntity;
-import com.gurpy.games.utils.Logger;
 
 import javax.swing.*;
 
@@ -19,13 +15,10 @@ import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.geom.Point2D;
-import java.io.PrintStream;
-import java.util.ArrayList;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class GurpusUI extends JPanel{
     //Allow for easy scaling of UIElements.
-    private final int SCALING = 1;
     private int fps = 0;
     private int numFramesInSecond = 0;
     private long lastFrameTime = 0;
@@ -33,7 +26,7 @@ public class GurpusUI extends JPanel{
     private CopyOnWriteArrayList<Integer> keyCodes = new CopyOnWriteArrayList<>();
     private UIMouseListener uiMouseListener;
     private RenderingComponent renderingComponent;
-    public final Dimension SCREEN_SIZE = Toolkit.getDefaultToolkit().getScreenSize();
+    //public final Dimension SCREEN_SIZE = Toolkit.getDefaultToolkit().getScreenSize();
 
     /**
      * Custom constructor for OSPanel Object.
@@ -58,8 +51,6 @@ public class GurpusUI extends JPanel{
         this.setFocusable(true);
         this.requestFocusInWindow();
 
-        //addConsoleToGUI(); //For debugging purposes...
-
         //Anonymous class for KeyListener.
         addKeyListener(new KeyListener() {
             @Override
@@ -78,6 +69,7 @@ public class GurpusUI extends JPanel{
             }
         });
 
+        final int SCALING = 1;
         renderingComponent = new RenderingComponent();
         TextElement fpsCounter = new TextElement(
                 new Point2D.Double(10, 20),
@@ -154,7 +146,7 @@ public class GurpusUI extends JPanel{
         }
 
         //Method to update current FPS.
-        checkFPS(g2d);
+        checkFPS();
         //Effectively recalls paintComponent(g);
         repaint();
     }
@@ -163,7 +155,7 @@ public class GurpusUI extends JPanel{
         return guiElements;
     }
 
-    public void addGuiElement(UIEntity uiEntity) {
+    private void addGuiElement(UIEntity uiEntity) {
         guiElements.add(uiEntity);
     }
 
@@ -191,21 +183,7 @@ public class GurpusUI extends JPanel{
         return fps;
     }
 
-    private void addConsoleToGUI() {
-        //Adds a text area with 20 rows and 20 cols.
-        JTextArea textArea = new JTextArea(20, 20);
-        //Set up the custom OutputStream attached to the textArea and title it.
-        TextAreaOutputStream guiOutputStream = new TextAreaOutputStream(textArea, "Application Output");
-        //Allow adding of new components to the panel in particular positions.
-        setLayout(new BorderLayout());
-        //Add the textArea object to the bottom of the page
-        add(new JScrollPane(textArea, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
-                JScrollPane.HORIZONTAL_SCROLLBAR_NEVER), BorderLayout.SOUTH);
-        //Hijack System.out console and add it to the GUI.
-        System.setOut(new PrintStream(guiOutputStream));
-    }
-
-    private void checkFPS(Graphics2D g2d) {
+    private void checkFPS() {
         long currentFrameTime = System.currentTimeMillis();
         numFramesInSecond++;
         if (currentFrameTime - lastFrameTime >= 1000) {

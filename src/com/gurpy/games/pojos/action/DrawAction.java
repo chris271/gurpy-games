@@ -76,7 +76,7 @@ public class DrawAction extends UIAction {
         }
     }
 
-    public void drawMenuItem(Graphics2D g2d, MenuItem item, Color borderColor, Color bgColor) {
+    private void drawMenuItem(Graphics2D g2d, MenuItem item, Color borderColor, Color bgColor) {
         //Draw border as a filled rectangle.
         g2d.setColor(borderColor);
         g2d.fill(new RoundRectangle2D.Double(

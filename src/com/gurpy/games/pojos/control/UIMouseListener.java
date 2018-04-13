@@ -57,31 +57,16 @@ public final class UIMouseListener implements MouseListener, MouseMotionListener
         return xPos;
     }
 
-    public void setxPos(double xPos) {
-        this.xPos = xPos;
-    }
-
     public double getyPos() {
         return yPos;
-    }
-
-    public void setyPos(double yPos) {
-        this.yPos = yPos;
     }
 
     public double getxPress() {
         return xPress;
     }
 
-    public void setxPress(double xPress) {
-        this.xPress = xPress;
-    }
-
     public double getyPress() {
         return yPress;
     }
 
-    public void setyPress(double yPress) {
-        this.yPress = yPress;
-    }
 }

@@ -1,7 +1,6 @@
 package com.gurpy.games.core;
 
 import com.gurpy.games.gui.GurpusUI;
-import com.gurpy.games.pojos.action.Action;
 import com.gurpy.games.pojos.action.TranslationAction;
 import com.gurpy.games.pojos.component.PhysicsComponent;
 import com.gurpy.games.pojos.entities.*;
@@ -9,64 +8,31 @@ import com.gurpy.games.pojos.entities.Menu;
 import com.gurpy.games.pojos.entities.MenuItem;
 import com.gurpy.games.utils.Logger;
 
-import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
-import java.io.IOException;
 
 public class GurpusCore implements Runnable{
 
     private final GurpusUI contentPane;
     private final static String OS = System.getProperty("os.name").toLowerCase();
-    private boolean actionFlag = false;
-    private boolean actionCompleteFlag = false;
     private boolean isMenu = true;
     private PhysicsComponent physicsComponent;
-    private Action currentAction;
 
-    public GurpusCore(GurpusUI contentPane) {
+    GurpusCore(GurpusUI contentPane) {
         this.contentPane = contentPane;
         this.physicsComponent = new PhysicsComponent();
     }
 
     public void run() {
 
+        Logger.info("Running on " + OS);
         while (contentPane.isShowing()) {
-
             updateCurrentGUIState();
-            if(actionFlag) {
-                try {
-                    actionCompleteFlag = performForResult(currentAction);
-                    if (actionCompleteFlag) {
-                        Logger.info("Action Completed!");
-                    }
-                } catch (IOException ex) {
-                    ex.printStackTrace();
-                } finally {
-                    actionFlag = false;
-                }
-            }
-
         }
 
         System.exit(1);
-    }
-
-    private boolean performForResult(Action action) throws IOException {
-
-        //Define resources...
-        try {
-            //Use resources...
-        } catch (Exception e) {
-            Logger.debug("Error: Unexpected Exception has occurred.");
-            e.printStackTrace();
-        } finally {
-            //Close resources...
-        }
-
-        return true;
     }
 
     private void updateCurrentGUIState() {
@@ -75,22 +41,7 @@ public class GurpusCore implements Runnable{
             if (e instanceof Player) {
                 Player player = (Player) e;
                 if (!isMenu) {
-                    if (contentPane.getKeyCodes().contains(KeyEvent.VK_LEFT)) {
-                        physicsComponent.performAction(new TranslationAction(player,
-                                new Point2D.Double(player.getX() - player.getHspeed(), player.getY())));
-                    }
-                    if (contentPane.getKeyCodes().contains(KeyEvent.VK_RIGHT)) {
-                        physicsComponent.performAction(new TranslationAction(player,
-                                new Point2D.Double(player.getX() + player.getHspeed(), player.getY())));
-                    }
-                    if (contentPane.getKeyCodes().contains(KeyEvent.VK_UP)) {
-                        physicsComponent.performAction(new TranslationAction(player,
-                                new Point2D.Double(player.getX(), player.getY() - player.getVspeed())));
-                    }
-                    if (contentPane.getKeyCodes().contains(KeyEvent.VK_DOWN)) {
-                        physicsComponent.performAction(new TranslationAction(player,
-                                new Point2D.Double(player.getX(), player.getY() + player.getVspeed())));
-                    }
+                    checkPlayerMovement(player);
                     ((Player)e).setDisplay(true);
                 } else {
                     ((Player)e).setDisplay(false);
@@ -117,13 +68,20 @@ public class GurpusCore implements Runnable{
                         } else {
                             item.setSelected(false);
                         }
-                        if (item.isSelected() && contentPane.getMouseClickX() > -1) {
+                        if (item.isSelected() && contentPane.getMouseClickX() > -1 && contentPane.getMouseClickY() > -1) {
                             if (item.getItemText().equalsIgnoreCase("Play Game")) {
+                                Logger.info("Starting Game.");
                                 isMenu = false;
                                 menu.setDisplay(false);
                                 contentPane.setBackground(Color.WHITE);
+                            } else if (item.getItemText().equalsIgnoreCase("Options")) {
+                                Logger.info("In Options.");
+                                menu.setDisplay(false);
+                            } else if (item.getItemText().equalsIgnoreCase("Controls")) {
+                                Logger.info("In Controls.");
+                                menu.setDisplay(false);
                             } else if (item.getItemText().equalsIgnoreCase("Exit Game")) {
-                                Logger.info("Exiting Game...");
+                                Logger.info("Exiting Game.");
                                 System.exit(1);
                             }
                         }
@@ -144,12 +102,23 @@ public class GurpusCore implements Runnable{
         }
     }
 
-    private void showInputInt() {
-        Integer.parseInt(JOptionPane.showInputDialog(null, "Choose an integer.", 0));
-    }
-
-    private void showInputString() {
-        JOptionPane.showInputDialog(null, "Choose a String.", "");
+    private void checkPlayerMovement(Player player) {
+        if (contentPane.getKeyCodes().contains(KeyEvent.VK_LEFT)) {
+            physicsComponent.performAction(new TranslationAction(player,
+                    new Point2D.Double(player.getX() - player.getHspeed(), player.getY())));
+        }
+        if (contentPane.getKeyCodes().contains(KeyEvent.VK_RIGHT)) {
+            physicsComponent.performAction(new TranslationAction(player,
+                    new Point2D.Double(player.getX() + player.getHspeed(), player.getY())));
+        }
+        if (contentPane.getKeyCodes().contains(KeyEvent.VK_UP)) {
+            physicsComponent.performAction(new TranslationAction(player,
+                    new Point2D.Double(player.getX(), player.getY() - player.getVspeed())));
+        }
+        if (contentPane.getKeyCodes().contains(KeyEvent.VK_DOWN)) {
+            physicsComponent.performAction(new TranslationAction(player,
+                    new Point2D.Double(player.getX(), player.getY() + player.getVspeed())));
+        }
     }
 
 }
