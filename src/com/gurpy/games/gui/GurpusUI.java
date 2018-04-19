@@ -19,6 +19,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 public class GurpusUI extends JPanel{
     //Allow for easy scaling of UIElements.
+    private final int MAX_FRAME_RATE = 120;
+    private long start = 0, diff, wait;
     private int fps = 0;
     private int numFramesInSecond = 0;
     private long lastFrameTime = 0;
@@ -122,7 +124,7 @@ public class GurpusUI extends JPanel{
                 Color.BLACK,
                 Color.WHITE,
                 10.0,
-                .1));
+                1));
 
         lastFrameTime = System.currentTimeMillis();
 
@@ -147,8 +149,22 @@ public class GurpusUI extends JPanel{
 
         //Method to update current FPS.
         checkFPS();
+        capFrameRate();
         //Effectively recalls paintComponent(g);
         repaint();
+    }
+
+    private void capFrameRate() {
+        wait = 1000 / MAX_FRAME_RATE;
+        diff = System.currentTimeMillis() - start;
+        if (diff < wait) {
+            try {
+                Thread.sleep(wait - diff);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        }
+        start = System.currentTimeMillis();
     }
 
     public CopyOnWriteArrayList<UIEntity> getGuiElements() {

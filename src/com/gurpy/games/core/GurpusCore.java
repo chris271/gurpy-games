@@ -30,6 +30,11 @@ public class GurpusCore implements Runnable{
         Logger.info("Running on " + OS);
         while (contentPane.isShowing()) {
             updateCurrentGUIState();
+            try {
+                Thread.sleep(10);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
         }
 
         System.exit(1);

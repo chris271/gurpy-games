@@ -19,8 +19,8 @@ public class Player extends BBoxElement {
     public Player(Point2D position, Dimension dimension, Color borderColor, Color bgColor,
                   double borderThickness, double speed) {
         super(position, dimension, borderColor, bgColor, borderThickness, EntityTypes.PLAYER);
-        this.hspeed = speed / 10000.0;
-        this.vspeed = speed / 10000.0;
+        this.hspeed = speed;
+        this.vspeed = speed;
     }
 
     /**
@@ -30,8 +30,8 @@ public class Player extends BBoxElement {
      */
     public Player(Point2D position, Dimension dimension, Color color, double speed) {
         super(position, dimension, color, color, 0.0, EntityTypes.PLAYER);
-        this.hspeed = speed / 10000.0;
-        this.vspeed = speed / 10000.0;
+        this.hspeed = speed;
+        this.vspeed = speed;
     }
 
     /**
@@ -41,8 +41,8 @@ public class Player extends BBoxElement {
      */
     public Player(Point2D position, Dimension dimension) {
         super(position, dimension, Color.BLACK, Color.WHITE, 2.0, EntityTypes.PLAYER);
-        this.hspeed = 0.00001;
-        this.vspeed = 0.00001;
+        this.hspeed = 1;
+        this.vspeed = 1;
     }
 
     public double getHspeed() {
