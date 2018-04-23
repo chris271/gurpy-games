@@ -5,6 +5,7 @@ import com.gurpy.games.pojos.entities.Menu;
 import com.gurpy.games.pojos.entities.MenuItem;
 
 import java.awt.*;
+import java.awt.geom.Line2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.RoundRectangle2D;
 
@@ -69,6 +70,17 @@ public class DrawAction extends UIAction {
                 drawMenuItem(g2d, item, item.getBgColor(), item.getBorderColor());
             } else {
                 drawMenuItem(g2d, item, item.getBorderColor(), item.getBgColor());
+            }
+            return true;
+        } else if (getOwner() instanceof Laser) {
+            Laser item = (Laser)getOwner();
+            for (int i = 0; i < item.getLines().size(); i++) {
+                if (i != 0 && i != item.getLines().size() - 1) {
+                    g2d.setColor(item.getBgColor());
+                } else {
+                    g2d.setColor(item.getBorderColor());
+                }
+                g2d.draw(item.getLines().get(i));
             }
             return true;
         } else {

@@ -1,6 +1,8 @@
 package com.gurpy.games.pojos.action;
 
 import com.gurpy.games.pojos.entities.BBoxElement;
+import com.gurpy.games.pojos.entities.Laser;
+import com.gurpy.games.pojos.entities.LineElement;
 import com.gurpy.games.pojos.entities.UIEntity;
 
 import java.awt.geom.Point2D;
@@ -19,6 +21,10 @@ public class TranslationAction extends UIAction {
         if (getOwner() instanceof BBoxElement) {
             BBoxElement boxElem = (BBoxElement)getOwner();
             boxElem.setPosition(newPos);
+            return true;
+        } else if (getOwner() instanceof Laser) {
+            Laser laser = (Laser) getOwner();
+            laser.setPosition(newPos);
             return true;
         } else {
             return false;

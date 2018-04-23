@@ -2,22 +2,21 @@ package com.gurpy.games.gui;
 
 import com.gurpy.games.pojos.action.DrawAction;
 import com.gurpy.games.pojos.component.RenderingComponent;
+import com.gurpy.games.pojos.control.Direction;
 import com.gurpy.games.pojos.control.UIMouseListener;
+import com.gurpy.games.pojos.entities.*;
 import com.gurpy.games.pojos.entities.Menu;
 import com.gurpy.games.pojos.entities.MenuItem;
-import com.gurpy.games.pojos.entities.Player;
-import com.gurpy.games.pojos.entities.TextElement;
-import com.gurpy.games.pojos.entities.UIEntity;
+
 
 import javax.swing.*;
-
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.geom.Point2D;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-public class GurpusUI extends JPanel{
+public class GurpusUI extends JPanel {
     //Allow for easy scaling of UIElements.
     private final int MAX_FRAME_RATE = 120;
     private long start = 0, diff, wait;
@@ -122,9 +121,10 @@ public class GurpusUI extends JPanel{
                 new Point2D.Double(getPreferredSize().getWidth() / 2 - 50, getPreferredSize().getHeight() / 2 - 50),
                 new Dimension(100 * SCALING, 100 * SCALING),
                 Color.BLACK,
-                Color.WHITE,
-                10.0,
-                1));
+                Color.RED,
+                15.0,
+                5));
+
 
         lastFrameTime = System.currentTimeMillis();
 

@@ -1,6 +1,7 @@
 package com.gurpy.games.pojos.entities;
 
 import com.gurpy.games.pojos.action.Action;
+import com.gurpy.games.pojos.control.Direction;
 
 import java.awt.*;
 import java.awt.geom.Point2D;
@@ -10,6 +11,7 @@ public class Player extends BBoxElement {
 
     private double hspeed;
     private double vspeed;
+    private int direction;
 
     /**
      * Constructor for custom color box player
@@ -21,6 +23,7 @@ public class Player extends BBoxElement {
         super(position, dimension, borderColor, bgColor, borderThickness, EntityTypes.PLAYER);
         this.hspeed = speed;
         this.vspeed = speed;
+        this.direction = Direction.UP;
     }
 
     /**
@@ -32,6 +35,7 @@ public class Player extends BBoxElement {
         super(position, dimension, color, color, 0.0, EntityTypes.PLAYER);
         this.hspeed = speed;
         this.vspeed = speed;
+        this.direction = Direction.UP;
     }
 
     /**
@@ -43,6 +47,7 @@ public class Player extends BBoxElement {
         super(position, dimension, Color.BLACK, Color.WHITE, 2.0, EntityTypes.PLAYER);
         this.hspeed = 1;
         this.vspeed = 1;
+        this.direction = Direction.UP;
     }
 
     public double getHspeed() {
@@ -59,5 +64,13 @@ public class Player extends BBoxElement {
 
     public void setVspeed(double vspeed) {
         this.vspeed = vspeed;
+    }
+
+    public int getDirection() {
+        return direction;
+    }
+
+    public void setDirection(int direction) {
+        this.direction = direction;
     }
 }
