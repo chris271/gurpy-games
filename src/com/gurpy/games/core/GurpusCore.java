@@ -58,14 +58,14 @@ public class GurpusCore implements Runnable{
     private void updateCurrentState() {
         //Iterate over each element.
         for (Entity e : contentPane.getGuiElements()) {
-            if (e instanceof Player) {
-                Player player = (Player) e;
+            if (e instanceof BBoxPlayer) {
+                BBoxPlayer player = (BBoxPlayer) e;
                 if (!isMenu) {
                     checkPlayerMovement(player);
                     checkPlayerShoot(player);
-                    ((Player)e).setDisplay(true);
+                    ((BBoxPlayer)e).setDisplay(true);
                 } else {
-                    ((Player)e).setDisplay(false);
+                    ((BBoxPlayer)e).setDisplay(false);
                 }
             }
             if (e instanceof Laser) {
@@ -122,8 +122,8 @@ public class GurpusCore implements Runnable{
                     }
                     //Check if alive.
                     laser.setStepsAlive(laser.getStepsAlive() + 1);
-                    if (laser.getOwner() instanceof Player &&
-                            laser.getStepsAlive() > ((Player)laser.getOwner()).getRange() * STEPS_PER_SEC - 1) {
+                    if (laser.getOwner() instanceof BBoxPlayer &&
+                            laser.getStepsAlive() > ((BBoxPlayer)laser.getOwner()).getRange() * STEPS_PER_SEC - 1) {
                         controlComponent.performAction(new DestroyAction((Laser) e, contentPane));
                     }
                 } else {
@@ -185,20 +185,18 @@ public class GurpusCore implements Runnable{
         }
     }
 
-    private void checkPlayerShoot(Player player) {
+    private void checkPlayerShoot(BBoxPlayer player) {
         if (player.getStepsSinceShot() < (STEPS_PER_SEC / player.getFireRate())) {
             player.setStepsSinceShot(player.getStepsSinceShot() + 1);
         }
         if (contentPane.getMouseClickX() > -1 && contentPane.getMouseClickY() > -1 &&
                 player.getStepsSinceShot() > (STEPS_PER_SEC / player.getFireRate()) - 1) {
             controlComponent.performAction(new ShootAction(player, contentPane));
-            Logger.info("Steps last second " + player.getStepsSinceShot());
             player.setStepsSinceShot(0);
-            Logger.info("Shoot");
         }
     }
 
-    private void checkPlayerMovement(Player player) {
+    private void checkPlayerMovement(BBoxPlayer player) {
 
         if ((contentPane.getKeyCodes().contains(KeyEvent.VK_UP) &&
                 contentPane.getKeyCodes().contains(KeyEvent.VK_RIGHT)) ||

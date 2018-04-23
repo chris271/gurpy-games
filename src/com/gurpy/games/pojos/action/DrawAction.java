@@ -5,7 +5,6 @@ import com.gurpy.games.pojos.entities.Menu;
 import com.gurpy.games.pojos.entities.MenuItem;
 
 import java.awt.*;
-import java.awt.geom.Line2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.RoundRectangle2D;
 
@@ -20,8 +19,8 @@ public class DrawAction extends UIAction {
 
     @Override
     public boolean perform() {
-        if (getOwner() instanceof Player) {
-            Player player = (Player)getOwner();
+        if (getOwner() instanceof BBoxPlayer) {
+            BBoxPlayer player = (BBoxPlayer)getOwner();
             //Draw border as a filled rectangle.
             g2d.setColor(player.getBorderColor());
             g2d.fill(new Rectangle2D.Double(

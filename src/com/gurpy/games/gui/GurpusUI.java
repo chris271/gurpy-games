@@ -2,7 +2,6 @@ package com.gurpy.games.gui;
 
 import com.gurpy.games.pojos.action.DrawAction;
 import com.gurpy.games.pojos.component.RenderingComponent;
-import com.gurpy.games.pojos.control.Direction;
 import com.gurpy.games.pojos.control.UIMouseListener;
 import com.gurpy.games.pojos.entities.*;
 import com.gurpy.games.pojos.entities.Menu;
@@ -121,7 +120,7 @@ public class GurpusUI extends JPanel {
                 "Gurpus Maximus",
                 24);
         addGuiElement(new Menu(menuTitle, menuItems, true));
-        addGuiElement(new Player(
+        addGuiElement(new BBoxPlayer(
                 new Point2D.Double(getPreferredSize().getWidth() / 2 - 50, getPreferredSize().getHeight() / 2 - 50),
                 new Dimension(100 * SCALING, 100 * SCALING),
                 Color.BLACK,

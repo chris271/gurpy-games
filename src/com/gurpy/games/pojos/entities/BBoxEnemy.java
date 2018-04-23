@@ -5,14 +5,14 @@ import com.gurpy.games.pojos.action.Action;
 import java.awt.*;
 import java.awt.geom.Point2D;
 
-public class Enemy extends BBoxElement {
+public class BBoxEnemy extends BBoxElement {
 
     /**
      * Constructor for custom color box enemy.
      * @param position
      * @param dimension
      */
-    public Enemy(Point2D position, Dimension dimension, Color borderColor, Color bgColor) {
+    public BBoxEnemy(Point2D position, Dimension dimension, Color borderColor, Color bgColor) {
         super(position, dimension, borderColor, bgColor, EntityTypes.PLAYER);
     }
 
@@ -21,7 +21,7 @@ public class Enemy extends BBoxElement {
      * @param position
      * @param dimension
      */
-    public Enemy(Point2D position, Dimension dimension, Color color) {
+    public BBoxEnemy(Point2D position, Dimension dimension, Color color) {
         super(position, dimension, color, color, EntityTypes.PLAYER);
     }
 
@@ -30,7 +30,7 @@ public class Enemy extends BBoxElement {
      * @param position
      * @param dimension
      */
-    public Enemy(Point2D position, Dimension dimension) {
+    public BBoxEnemy(Point2D position, Dimension dimension) {
         super(position, dimension, Color.BLACK, Color.WHITE, EntityTypes.PLAYER);
     }
 

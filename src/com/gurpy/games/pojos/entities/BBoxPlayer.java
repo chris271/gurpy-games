@@ -7,7 +7,7 @@ import java.awt.*;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 
-public class Player extends BBoxElement {
+public class BBoxPlayer extends BBoxElement {
 
     private double hspeed;
     private double vspeed;
@@ -18,25 +18,26 @@ public class Player extends BBoxElement {
     private double bulletHeight;
     private int direction;
     private int stepsSinceShot;
-
+    private int numBullets;
 
     /**
      * Constructor for custom color box player
      * @param position
      * @param dimension
      */
-    public Player(Point2D position, Dimension dimension, Color borderColor, Color bgColor,
-                  double borderThickness, double speed) {
+    public BBoxPlayer(Point2D position, Dimension dimension, Color borderColor, Color bgColor,
+                      double borderThickness, double speed) {
         super(position, dimension, borderColor, bgColor, borderThickness, EntityTypes.PLAYER);
         this.hspeed = speed;
         this.vspeed = speed;
         this.direction = Direction.UP;
-        this.fireRate = 1;
+        this.fireRate = 2;
         this.range = 1;
         this.bulletWidth = 1;
         this.bulletHeight = 25;
-        this.shotSpeed = 4;
+        this.shotSpeed = 20;
         this.stepsSinceShot = 0;
+        this.numBullets = 1;
     }
 
     /**
@@ -44,17 +45,18 @@ public class Player extends BBoxElement {
      * @param position
      * @param dimension
      */
-    public Player(Point2D position, Dimension dimension, Color color, double speed) {
+    public BBoxPlayer(Point2D position, Dimension dimension, Color color, double speed) {
         super(position, dimension, color, color, 0.0, EntityTypes.PLAYER);
         this.hspeed = speed;
         this.vspeed = speed;
         this.direction = Direction.UP;
-        this.fireRate = 1;
+        this.fireRate = 2;
         this.range = 1;
         this.bulletWidth = 1;
         this.bulletHeight = 25;
-        this.shotSpeed = 4;
+        this.shotSpeed = 20;
         this.stepsSinceShot = 0;
+        this.numBullets = 1;
     }
 
     /**
@@ -62,17 +64,18 @@ public class Player extends BBoxElement {
      * @param position
      * @param dimension
      */
-    public Player(Point2D position, Dimension dimension) {
+    public BBoxPlayer(Point2D position, Dimension dimension) {
         super(position, dimension, Color.BLACK, Color.WHITE, 2.0, EntityTypes.PLAYER);
         this.hspeed = 1;
         this.vspeed = 1;
         this.direction = Direction.UP;
-        this.fireRate = 1;
+        this.fireRate = 2;
         this.range = 1;
         this.bulletWidth = 1;
         this.bulletHeight = 25;
-        this.shotSpeed = 4;
+        this.shotSpeed = 20 ;
         this.stepsSinceShot = 0;
+        this.numBullets = 1;
     }
 
     public double getHspeed() {
@@ -149,5 +152,13 @@ public class Player extends BBoxElement {
 
     public void setStepsSinceShot(int stepsSinceShot) {
         this.stepsSinceShot = stepsSinceShot;
+    }
+
+    public int getNumBullets() {
+        return numBullets;
+    }
+
+    public void setNumBullets(int numBullets) {
+        this.numBullets = numBullets;
     }
 }
