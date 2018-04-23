@@ -1,9 +1,8 @@
 package com.gurpy.games.pojos.entities;
 
-import com.gurpy.games.pojos.action.Action;
-
 import java.awt.*;
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 
 public class BBoxElement extends UIElement {
 
@@ -61,6 +60,10 @@ public class BBoxElement extends UIElement {
 
     public void setHeight(double height) {
         this.height = height;
+    }
+
+    public Rectangle2D getBBox() {
+        return new Rectangle2D.Double(getX(), getY(), getWidth(), getHeight());
     }
 
 }

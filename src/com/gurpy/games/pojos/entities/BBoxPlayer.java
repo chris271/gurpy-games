@@ -33,7 +33,7 @@ public class BBoxPlayer extends BBoxElement {
         this.direction = Direction.UP;
         this.fireRate = 2;
         this.range = 1;
-        this.bulletWidth = 1;
+        this.bulletWidth = 3;
         this.bulletHeight = 25;
         this.shotSpeed = 20;
         this.stepsSinceShot = 0;

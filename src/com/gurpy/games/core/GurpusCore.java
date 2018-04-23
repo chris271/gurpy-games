@@ -1,6 +1,7 @@
 package com.gurpy.games.core;
 
 import com.gurpy.games.gui.GurpusUI;
+import com.gurpy.games.pojos.action.CollisionAction;
 import com.gurpy.games.pojos.action.DestroyAction;
 import com.gurpy.games.pojos.action.ShootAction;
 import com.gurpy.games.pojos.action.TranslationAction;
@@ -58,74 +59,32 @@ public class GurpusCore implements Runnable{
     private void updateCurrentState() {
         //Iterate over each element.
         for (Entity e : contentPane.getGuiElements()) {
+            //Check collisions
+            for (UIEntity other : contentPane.getGuiElements()) {
+                controlComponent.performAction(new CollisionAction((UIEntity)e, other));
+            }
+            //Check input and update physics.
             if (e instanceof BBoxPlayer) {
                 BBoxPlayer player = (BBoxPlayer) e;
                 if (!isMenu) {
-                    checkPlayerMovement(player);
-                    checkPlayerShoot(player);
-                    ((BBoxPlayer)e).setDisplay(true);
+                    checkPlayerInput(player);
+                    player.setDisplay(true);
                 } else {
-                    ((BBoxPlayer)e).setDisplay(false);
+                    player.setDisplay(false);
                 }
+                for (UIEntity collision : player.getCollisions()) {
+                    if (collision instanceof Laser) {
+                        player.setDisplay(false);
+                    }
+                }
+                player.getCollisions().clear();
             }
             if (e instanceof Laser) {
                 Laser laser = (Laser) e;
                 if (!isMenu) {
                     laser.setDisplay(true);
-                    // 0 - UP
-                    if (laser.getDirection() == 0) {
-                        physicsComponent.performAction(new TranslationAction(laser,
-                                new Point2D.Double(laser.getLines().get(0).getP1().getX(),
-                                        laser.getLines().get(0).getP1().getY() - laser.getVspeed())));
-                    }
-                    // 1 - UP_RIGHT
-                    else if (laser.getDirection() == 1) {
-                        physicsComponent.performAction(new TranslationAction(laser,
-                                new Point2D.Double(laser.getLines().get(0).getP1().getX() + laser.getHspeed() / 2,
-                                        laser.getLines().get(0).getP1().getY() - laser.getVspeed() / 2)));
-                    }
-                    // 2 - RIGHT
-                    else if (laser.getDirection() == 2) {
-                        physicsComponent.performAction(new TranslationAction(laser,
-                                new Point2D.Double(laser.getLines().get(0).getP1().getX() + laser.getHspeed(),
-                                        laser.getLines().get(0).getP1().getY())));
-                    }
-                    // 3 - DOWN_RIGHT
-                    else if (laser.getDirection() == 3) {
-                        physicsComponent.performAction(new TranslationAction(laser,
-                                new Point2D.Double(laser.getLines().get(0).getP1().getX() + laser.getHspeed() / 2,
-                                        laser.getLines().get(0).getP1().getY() + laser.getVspeed() / 2)));
-                    }
-                    // 4 - DOWN
-                    else if (laser.getDirection() == 4) {
-                        physicsComponent.performAction(new TranslationAction(laser,
-                                new Point2D.Double(laser.getLines().get(0).getP1().getX(),
-                                        laser.getLines().get(0).getP1().getY() + laser.getVspeed())));
-                    }
-                    // 5 - DOWN_LEFT
-                    else if (laser.getDirection() == 5) {
-                        physicsComponent.performAction(new TranslationAction(laser,
-                                new Point2D.Double(laser.getLines().get(0).getP1().getX() - laser.getHspeed() / 2,
-                                        laser.getLines().get(0).getP1().getY() + laser.getVspeed() / 2)));
-                    }
-                    // 6 - LEFT
-                    else if (laser.getDirection() == 6) {
-                        physicsComponent.performAction(new TranslationAction(laser,
-                                new Point2D.Double(laser.getLines().get(0).getP1().getX() - laser.getHspeed(),
-                                        laser.getLines().get(0).getP1().getY())));
-                    }
-                    // 7 - UP_LEFT
-                    else if (laser.getDirection() == 7) {
-                        physicsComponent.performAction(new TranslationAction(laser,
-                                new Point2D.Double(laser.getLines().get(0).getP1().getX() - laser.getHspeed() / 2,
-                                        laser.getLines().get(0).getP1().getY() - laser.getVspeed() / 2)));
-                    }
-                    //Check if alive.
-                    laser.setStepsAlive(laser.getStepsAlive() + 1);
-                    if (laser.getOwner() instanceof BBoxPlayer &&
-                            laser.getStepsAlive() > ((BBoxPlayer)laser.getOwner()).getRange() * STEPS_PER_SEC - 1) {
-                        controlComponent.performAction(new DestroyAction((Laser) e, contentPane));
-                    }
+                    updateLaserMovement(laser);
+                    updateLaserState(laser);
                 } else {
                     laser.setDisplay(false);
                 }
@@ -144,29 +103,14 @@ public class GurpusCore implements Runnable{
                 Menu menu = (Menu)e;
                 if (menu.isDisplay()) {
                     for (MenuItem item : menu.getMenuItems()) {
-                        Rectangle2D.Double itemRect = new Rectangle2D.Double(
-                                item.getX(), item.getY(), item.getWidth(), item.getHeight());
-                        if (itemRect.contains(contentPane.getMouseX(), contentPane.getMouseY())) {
+                        if (new Rectangle2D.Double(item.getX(), item.getY(), item.getWidth(), item.getHeight())
+                                .contains(contentPane.getMouseX(), contentPane.getMouseY())) {
                             item.setSelected(true);
                         } else {
                             item.setSelected(false);
                         }
-                        if (item.isSelected() && contentPane.getMouseClickX() > -1 && contentPane.getMouseClickY() > -1) {
-                            if (item.getItemText().equalsIgnoreCase("Play Game")) {
-                                Logger.info("Starting Game.");
-                                isMenu = false;
-                                menu.setDisplay(false);
-                                contentPane.setBackground(Color.WHITE);
-                            } else if (item.getItemText().equalsIgnoreCase("Options")) {
-                                Logger.info("In Options.");
-                                menu.setDisplay(false);
-                            } else if (item.getItemText().equalsIgnoreCase("Controls")) {
-                                Logger.info("In Controls.");
-                                menu.setDisplay(false);
-                            } else if (item.getItemText().equalsIgnoreCase("Exit Game")) {
-                                Logger.info("Exiting Game.");
-                                System.exit(1);
-                            }
+                        if (item.isSelected() && selectInput()) {
+                            checkMenuItem(menu, item);
                         }
                     }
                 } else {
@@ -185,20 +129,90 @@ public class GurpusCore implements Runnable{
         }
     }
 
-    private void checkPlayerShoot(BBoxPlayer player) {
-        if (player.getStepsSinceShot() < (STEPS_PER_SEC / player.getFireRate())) {
-            player.setStepsSinceShot(player.getStepsSinceShot() + 1);
-        }
-        if (contentPane.getMouseClickX() > -1 && contentPane.getMouseClickY() > -1 &&
-                player.getStepsSinceShot() > (STEPS_PER_SEC / player.getFireRate()) - 1) {
-            controlComponent.performAction(new ShootAction(player, contentPane));
-            player.setStepsSinceShot(0);
+    private void updateLaserState(Laser laser) {
+        laser.setStepsAlive(laser.getStepsAlive() + 1);
+        if (laser.getOwner() instanceof BBoxPlayer &&
+                laser.getStepsAlive() > ((BBoxPlayer)laser.getOwner()).getRange() * STEPS_PER_SEC - 1) {
+            controlComponent.performAction(new DestroyAction(laser, contentPane));
         }
     }
 
-    private void checkPlayerMovement(BBoxPlayer player) {
+    private void checkMenuItem(Menu menu, MenuItem item) {
+        String itemText = item.getItemText();
+        switch (itemText) {
+            case "Play Game":
+                Logger.info("Starting Game.");
+                isMenu = false;
+                menu.setDisplay(false);
+                contentPane.setBackground(Color.WHITE);
+                break;
+            case "Options":
+                Logger.info("In Options.");
+                menu.setDisplay(false);
+                break;
+            case "Controls":
+                Logger.info("In Controls.");
+                menu.setDisplay(false);
+                break;
+            case "Exit Game":
+                Logger.info("Exiting Game.");
+                System.exit(1);
+                break;
+        }
+    }
 
-        if ((contentPane.getKeyCodes().contains(KeyEvent.VK_UP) &&
+    private void updateLaserMovement(Laser laser) {
+        int laserDir = laser.getDirection();
+        TranslationAction translationAction = new TranslationAction(laser, new Point2D.Double(0, 0));
+        switch (laserDir) {
+            case Direction.UP:
+                translationAction.setPosition(new Point2D.Double(laser.getLines().get(0).getP1().getX(),
+                        laser.getLines().get(0).getP1().getY() - laser.getVspeed()));
+                break;
+            case Direction.UP_RIGHT:
+                translationAction.setPosition(new Point2D.Double(laser.getLines().get(0).getP1().getX() + laser.getHspeed() / 2,
+                        laser.getLines().get(0).getP1().getY() - laser.getVspeed() / 2));
+                break;
+            case Direction.RIGHT:
+                translationAction.setPosition(new Point2D.Double(laser.getLines().get(0).getP1().getX() + laser.getHspeed(),
+                        laser.getLines().get(0).getP1().getY()));
+                break;
+            case Direction.DOWN_RIGHT:
+                translationAction.setPosition(new Point2D.Double(laser.getLines().get(0).getP1().getX() + laser.getHspeed() / 2,
+                        laser.getLines().get(0).getP1().getY() + laser.getVspeed() / 2));
+                break;
+            case Direction.DOWN:
+                translationAction.setPosition(new Point2D.Double(laser.getLines().get(0).getP1().getX(),
+                        laser.getLines().get(0).getP1().getY() + laser.getVspeed()));
+                break;
+            case Direction.DOWN_LEFT:
+                translationAction.setPosition(new Point2D.Double(laser.getLines().get(0).getP1().getX() - laser.getHspeed() / 2,
+                        laser.getLines().get(0).getP1().getY() + laser.getVspeed() / 2));
+                break;
+            case Direction.LEFT:
+                translationAction.setPosition(new Point2D.Double(laser.getLines().get(0).getP1().getX() - laser.getHspeed(),
+                        laser.getLines().get(0).getP1().getY()));
+                break;
+            case Direction.UP_LEFT:
+                translationAction.setPosition(new Point2D.Double(laser.getLines().get(0).getP1().getX() - laser.getHspeed() / 2,
+                        laser.getLines().get(0).getP1().getY() - laser.getVspeed() / 2));
+                break;
+            default:
+                translationAction.setPosition(new Point2D.Double(laser.getLines().get(0).getP1().getX(),
+                        laser.getLines().get(0).getP1().getY() - laser.getVspeed()));
+                break;
+        }
+        physicsComponent.performAction(translationAction);
+    }
+
+    private void checkPlayerInput(BBoxPlayer player) {
+
+        //Movement
+        if (contentPane.getKeyCodes().size() > 2) {
+
+            player.setDirection(Direction.UP);
+
+        } else if ((contentPane.getKeyCodes().contains(KeyEvent.VK_UP) &&
                 contentPane.getKeyCodes().contains(KeyEvent.VK_RIGHT)) ||
                 (contentPane.getKeyCodes().contains(KeyEvent.VK_W) &&
                         contentPane.getKeyCodes().contains(KeyEvent.VK_D))) {
@@ -270,6 +284,20 @@ public class GurpusCore implements Runnable{
             player.setDirection(Direction.LEFT);
 
         }
+        //Shooting
+        if (player.getStepsSinceShot() < (STEPS_PER_SEC / player.getFireRate())) {
+            player.setStepsSinceShot(player.getStepsSinceShot() + 1);
+        }
+        if (selectInput() && player.getStepsSinceShot() > (STEPS_PER_SEC / player.getFireRate()) - 1) {
+            controlComponent.performAction(new ShootAction(player, contentPane));
+            player.setStepsSinceShot(0);
+        }
+    }
+
+    private boolean selectInput() {
+        return (contentPane.getMouseClickX() > -1 && contentPane.getMouseClickY() > -1) ||
+                contentPane.getKeyCodes().contains(KeyEvent.VK_ENTER) ||
+                contentPane.getKeyCodes().contains(KeyEvent.VK_SPACE);
     }
 
 }

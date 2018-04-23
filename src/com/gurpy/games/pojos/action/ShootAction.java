@@ -19,39 +19,15 @@ public class ShootAction extends SpawnAction {
         if (getOwner() instanceof BBoxPlayer) {
             BBoxPlayer player = (BBoxPlayer) getOwner();
             for (int i = 0; i < player.getNumBullets(); i++) {
-                int playerDir;
+
+                int laserDir;
                 double bulletOffset = player.getBulletHeight();
-                if (player.getNumBullets() < 2) {
-                    playerDir = player.getDirection();
-                } else if (player.getNumBullets() > 2) {
-                    switch (i) {
-                        case 0:
-                            if (player.getDirection() > 0)
-                                playerDir = player.getDirection() - 1;
-                            else
-                                playerDir = 7;
-                            break;
-                        case 1:
-                            if (player.getDirection() < 7)
-                                playerDir = player.getDirection() + 1;
-                            else
-                                playerDir = 0;
-                            break;
-                        case 2:
-                            playerDir = player.getDirection();
-                            break;
-                        default:
-                            playerDir = player.getDirection();
-                            break;
-                    }
-                } else {
-                    if (i == 0)
-                        bulletOffset += player.getBulletWidth() - 5;
-                    else
-                        bulletOffset += player.getBulletWidth() + 5;
-                    playerDir = player.getDirection();
-                }
-                switch (playerDir) {
+                if (i % 2 == 1)
+                    laserDir = (player.getDirection() + (i + 1) / 2) % 8;
+                else
+                    laserDir = (8 - (i / 2) + player.getDirection()) % 8;
+
+                switch (laserDir) {
                     case Direction.UP:
                         getContentPane().getGuiElements().add(new Laser(
                                 new Point2D.Double(player.getX() + player.getWidth() / 2, player.getY() + bulletOffset),
@@ -60,7 +36,7 @@ public class ShootAction extends SpawnAction {
                                 player.getBgColor(),
                                 player.getBulletWidth(),
                                 player.getShotSpeed(),
-                                playerDir,
+                                laserDir,
                                 player));
                         break;
                     case Direction.UP_RIGHT:
@@ -71,7 +47,7 @@ public class ShootAction extends SpawnAction {
                                 player.getBgColor(),
                                 player.getBulletWidth(),
                                 player.getShotSpeed(),
-                                playerDir,
+                                laserDir,
                                 player));
                         break;
                     case Direction.RIGHT:
@@ -82,7 +58,7 @@ public class ShootAction extends SpawnAction {
                                 player.getBgColor(),
                                 player.getBulletWidth(),
                                 player.getShotSpeed(),
-                                playerDir,
+                                laserDir,
                                 player));
                         break;
                     case Direction.DOWN_RIGHT:
@@ -93,7 +69,7 @@ public class ShootAction extends SpawnAction {
                                 player.getBgColor(),
                                 player.getBulletWidth(),
                                 player.getShotSpeed(),
-                                playerDir,
+                                laserDir,
                                 player));
                         break;
                     case Direction.DOWN:
@@ -104,7 +80,7 @@ public class ShootAction extends SpawnAction {
                                 player.getBgColor(),
                                 player.getBulletWidth(),
                                 player.getShotSpeed(),
-                                playerDir,
+                                laserDir,
                                 player));
                         break;
                     case Direction.DOWN_LEFT:
@@ -115,7 +91,7 @@ public class ShootAction extends SpawnAction {
                                 player.getBgColor(),
                                 player.getBulletWidth(),
                                 player.getShotSpeed(),
-                                playerDir,
+                                laserDir,
                                 player));
                         break;
                     case Direction.LEFT:
@@ -126,7 +102,7 @@ public class ShootAction extends SpawnAction {
                                 player.getBgColor(),
                                 player.getBulletWidth(),
                                 player.getShotSpeed(),
-                                playerDir,
+                                laserDir,
                                 player));
                         break;
                     case Direction.UP_LEFT:
@@ -137,7 +113,7 @@ public class ShootAction extends SpawnAction {
                                 player.getBgColor(),
                                 player.getBulletWidth(),
                                 player.getShotSpeed(),
-                                playerDir,
+                                laserDir,
                                 player));
                         break;
                     default:
@@ -148,7 +124,7 @@ public class ShootAction extends SpawnAction {
                                 player.getBgColor(),
                                 player.getBulletWidth(),
                                 player.getShotSpeed(),
-                                playerDir,
+                                laserDir,
                                 player));
                         break;
                 }

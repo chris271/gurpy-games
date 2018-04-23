@@ -2,6 +2,7 @@ package com.gurpy.games.pojos.entities;
 
 import java.awt.*;
 import java.awt.geom.Point2D;
+import java.util.ArrayList;
 
 /**
  * Class GUIElement
@@ -17,6 +18,7 @@ public abstract class UIElement implements UIEntity{
     private int type;
     private Color borderColor;
     private Color bgColor;
+    private ArrayList<UIEntity> collisions;
 
     /**
      * Contructor used for custom UI element.
@@ -32,6 +34,7 @@ public abstract class UIElement implements UIEntity{
         this.bgColor = bgColor;
         this.type = type;
         this.borderThickness = borderThickness;
+        collisions = new ArrayList<>();
     }
 
     /**
@@ -47,6 +50,7 @@ public abstract class UIElement implements UIEntity{
         this.bgColor = color;
         this.type = type;
         this.borderThickness = 0.0;
+        collisions = new ArrayList<>();
     }
 
     /**
@@ -61,6 +65,7 @@ public abstract class UIElement implements UIEntity{
         this.bgColor = Color.BLACK;
         this.type = type;
         this.borderThickness = 0.0;
+        collisions = new ArrayList<>();
     }
 
     /**
@@ -74,6 +79,7 @@ public abstract class UIElement implements UIEntity{
         this.bgColor = Color.BLACK;
         type = EntityTypes.DEFAULT;
         this.borderThickness = 0.0;
+        collisions = new ArrayList<>();
     }
 
     @Override
@@ -161,4 +167,11 @@ public abstract class UIElement implements UIEntity{
         this.borderThickness = borderThickness;
     }
 
+    public ArrayList<UIEntity> getCollisions() {
+        return collisions;
+    }
+
+    public void addCollision(UIEntity collision) {
+        collisions.add(collision);
+    }
 }

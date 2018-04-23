@@ -1,37 +1,19 @@
 package com.gurpy.games.pojos.entities;
 
-import com.gurpy.games.pojos.action.Action;
-
 import java.awt.*;
 import java.awt.geom.Point2D;
 
-public class BBoxEnemy extends BBoxElement {
+public class BBoxEnemy extends BBoxPlayer {
 
-    /**
-     * Constructor for custom color box enemy.
-     * @param position
-     * @param dimension
-     */
-    public BBoxEnemy(Point2D position, Dimension dimension, Color borderColor, Color bgColor) {
-        super(position, dimension, borderColor, bgColor, EntityTypes.PLAYER);
+    public BBoxEnemy(Point2D position, Dimension dimension, Color borderColor, Color bgColor, double borderThickness, double speed) {
+        super(position, dimension, borderColor, bgColor, borderThickness, speed);
     }
 
-    /**
-     * Constructor for solid color box enemy.
-     * @param position
-     * @param dimension
-     */
-    public BBoxEnemy(Point2D position, Dimension dimension, Color color) {
-        super(position, dimension, color, color, EntityTypes.PLAYER);
+    public BBoxEnemy(Point2D position, Dimension dimension, Color color, double speed) {
+        super(position, dimension, color, speed);
     }
 
-    /**
-     * Constructor for default box enemy.
-     * @param position
-     * @param dimension
-     */
     public BBoxEnemy(Point2D position, Dimension dimension) {
-        super(position, dimension, Color.BLACK, Color.WHITE, EntityTypes.PLAYER);
+        super(position, dimension);
     }
-
 }

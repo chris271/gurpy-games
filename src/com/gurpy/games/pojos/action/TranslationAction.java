@@ -2,7 +2,6 @@ package com.gurpy.games.pojos.action;
 
 import com.gurpy.games.pojos.entities.BBoxElement;
 import com.gurpy.games.pojos.entities.Laser;
-import com.gurpy.games.pojos.entities.LineElement;
 import com.gurpy.games.pojos.entities.UIEntity;
 
 import java.awt.geom.Point2D;
@@ -29,5 +28,13 @@ public class TranslationAction extends UIAction {
         } else {
             return false;
         }
+    }
+
+    public Point2D.Double getPosition() {
+        return newPos;
+    }
+
+    public void setPosition(Point2D.Double newPos) {
+        this.newPos = newPos;
     }
 }
