@@ -1,7 +1,10 @@
 package com.gurpy.games.core;
 
 import com.gurpy.games.gui.GurpusUI;
+import com.gurpy.games.pojos.action.DestroyAction;
+import com.gurpy.games.pojos.action.ShootAction;
 import com.gurpy.games.pojos.action.TranslationAction;
+import com.gurpy.games.pojos.component.ControlComponent;
 import com.gurpy.games.pojos.component.PhysicsComponent;
 import com.gurpy.games.pojos.control.Direction;
 import com.gurpy.games.pojos.entities.*;
@@ -16,32 +19,43 @@ import java.awt.geom.Rectangle2D;
 
 public class GurpusCore implements Runnable{
 
+    public static final double STEPS_PER_SEC = 100;
     private final GurpusUI contentPane;
     private final static String OS = System.getProperty("os.name").toLowerCase();
     private boolean isMenu = true;
     private PhysicsComponent physicsComponent;
+    private ControlComponent controlComponent;
 
     GurpusCore(GurpusUI contentPane) {
         this.contentPane = contentPane;
         this.physicsComponent = new PhysicsComponent();
+        this.controlComponent = new ControlComponent();
     }
 
     public void run() {
 
+        final long NANO_IN_MILLI = 1000000;
+
+        final long STEP_TIME = 10 * NANO_IN_MILLI;
         Logger.info("Running on " + OS);
+
         while (contentPane.isShowing()) {
-            updateCurrentGUIState();
-            try {
-                Thread.sleep(10);
-            } catch (Exception ex) {
-                ex.printStackTrace();
+            long startStep = System.nanoTime();
+            updateCurrentState();
+            long nanoToSleep = STEP_TIME - (System.nanoTime() - startStep);
+            if (nanoToSleep > 0) {
+                try {
+                    Thread.sleep(nanoToSleep / NANO_IN_MILLI, (int) (nanoToSleep % NANO_IN_MILLI));
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
             }
         }
 
         System.exit(1);
     }
 
-    private void updateCurrentGUIState() {
+    private void updateCurrentState() {
         //Iterate over each element.
         for (Entity e : contentPane.getGuiElements()) {
             if (e instanceof Player) {
@@ -62,49 +76,55 @@ public class GurpusCore implements Runnable{
                     if (laser.getDirection() == 0) {
                         physicsComponent.performAction(new TranslationAction(laser,
                                 new Point2D.Double(laser.getLines().get(0).getP1().getX(),
-                                        laser.getLines().get(0).getP1().getY() - laser.getSpeed())));
+                                        laser.getLines().get(0).getP1().getY() - laser.getVspeed())));
                     }
                     // 1 - UP_RIGHT
                     else if (laser.getDirection() == 1) {
                         physicsComponent.performAction(new TranslationAction(laser,
-                                new Point2D.Double(laser.getLines().get(0).getP1().getX() + laser.getSpeed() / 2,
-                                        laser.getLines().get(0).getP1().getY() - laser.getSpeed() / 2)));
+                                new Point2D.Double(laser.getLines().get(0).getP1().getX() + laser.getHspeed() / 2,
+                                        laser.getLines().get(0).getP1().getY() - laser.getVspeed() / 2)));
                     }
                     // 2 - RIGHT
                     else if (laser.getDirection() == 2) {
                         physicsComponent.performAction(new TranslationAction(laser,
-                                new Point2D.Double(laser.getLines().get(0).getP1().getX() + laser.getSpeed(),
+                                new Point2D.Double(laser.getLines().get(0).getP1().getX() + laser.getHspeed(),
                                         laser.getLines().get(0).getP1().getY())));
                     }
                     // 3 - DOWN_RIGHT
                     else if (laser.getDirection() == 3) {
                         physicsComponent.performAction(new TranslationAction(laser,
-                                new Point2D.Double(laser.getLines().get(0).getP1().getX() + laser.getSpeed() / 2,
-                                        laser.getLines().get(0).getP1().getY() + laser.getSpeed() / 2)));
+                                new Point2D.Double(laser.getLines().get(0).getP1().getX() + laser.getHspeed() / 2,
+                                        laser.getLines().get(0).getP1().getY() + laser.getVspeed() / 2)));
                     }
                     // 4 - DOWN
                     else if (laser.getDirection() == 4) {
                         physicsComponent.performAction(new TranslationAction(laser,
                                 new Point2D.Double(laser.getLines().get(0).getP1().getX(),
-                                        laser.getLines().get(0).getP1().getY() + laser.getSpeed())));
+                                        laser.getLines().get(0).getP1().getY() + laser.getVspeed())));
                     }
                     // 5 - DOWN_LEFT
                     else if (laser.getDirection() == 5) {
                         physicsComponent.performAction(new TranslationAction(laser,
-                                new Point2D.Double(laser.getLines().get(0).getP1().getX() - laser.getSpeed() / 2,
-                                        laser.getLines().get(0).getP1().getY() + laser.getSpeed() / 2)));
+                                new Point2D.Double(laser.getLines().get(0).getP1().getX() - laser.getHspeed() / 2,
+                                        laser.getLines().get(0).getP1().getY() + laser.getVspeed() / 2)));
                     }
                     // 6 - LEFT
                     else if (laser.getDirection() == 6) {
                         physicsComponent.performAction(new TranslationAction(laser,
-                                new Point2D.Double(laser.getLines().get(0).getP1().getX() - laser.getSpeed(),
+                                new Point2D.Double(laser.getLines().get(0).getP1().getX() - laser.getHspeed(),
                                         laser.getLines().get(0).getP1().getY())));
                     }
                     // 7 - UP_LEFT
                     else if (laser.getDirection() == 7) {
                         physicsComponent.performAction(new TranslationAction(laser,
-                                new Point2D.Double(laser.getLines().get(0).getP1().getX() - laser.getSpeed() / 2,
-                                        laser.getLines().get(0).getP1().getY() - laser.getSpeed() / 2)));
+                                new Point2D.Double(laser.getLines().get(0).getP1().getX() - laser.getHspeed() / 2,
+                                        laser.getLines().get(0).getP1().getY() - laser.getVspeed() / 2)));
+                    }
+                    //Check if alive.
+                    laser.setStepsAlive(laser.getStepsAlive() + 1);
+                    if (laser.getOwner() instanceof Player &&
+                            laser.getStepsAlive() > ((Player)laser.getOwner()).getRange() * STEPS_PER_SEC - 1) {
+                        controlComponent.performAction(new DestroyAction((Laser) e, contentPane));
                     }
                 } else {
                     laser.setDisplay(false);
@@ -166,87 +186,15 @@ public class GurpusCore implements Runnable{
     }
 
     private void checkPlayerShoot(Player player) {
-        if (contentPane.getMouseClickX() > -1 && contentPane.getMouseClickY() > -1) {
-            if (player.getDirection() == Direction.UP) {
-                contentPane.getGuiElements().add(new Laser(
-                        new Point2D.Double(player.getX() + player.getWidth() / 2, player.getY() + 50),
-                        new Point2D.Double(player.getX() + player.getWidth() / 2, player.getY() - 50),
-                        Color.BLACK,
-                        Color.RED,
-                        15.0,
-                        4,
-                        player.getDirection()));
-            }
-            else if (player.getDirection() == Direction.UP_RIGHT) {
-                contentPane.getGuiElements().add(new Laser(
-                        new Point2D.Double(player.getX() + player.getWidth() + 50, player.getY() - 50),
-                        new Point2D.Double(player.getX() + player.getWidth() - 50, player.getY() + 50),
-                        Color.BLACK,
-                        Color.RED,
-                        15.0,
-                        4,
-                        player.getDirection()));
-            }
-            else if (player.getDirection() == Direction.RIGHT) {
-                contentPane.getGuiElements().add(new Laser(
-                        new Point2D.Double(player.getX() + player.getWidth() + 50, player.getY() + player.getHeight() / 2),
-                        new Point2D.Double(player.getX() + player.getWidth() - 50, player.getY() + player.getHeight() / 2),
-                        Color.BLACK,
-                        Color.RED,
-                        15.0,
-                        4,
-                        player.getDirection()));
-            }
-            else if (player.getDirection() == Direction.DOWN_RIGHT) {
-                contentPane.getGuiElements().add(new Laser(
-                        new Point2D.Double(player.getX() + player.getWidth() + 50, player.getY() + player.getHeight() + 50),
-                        new Point2D.Double(player.getX() + player.getWidth() - 50, player.getY() + player.getHeight() - 50),
-                        Color.BLACK,
-                        Color.RED,
-                        15.0,
-                        4,
-                        player.getDirection()));
-            }
-            else if (player.getDirection() == Direction.DOWN) {
-                contentPane.getGuiElements().add(new Laser(
-                        new Point2D.Double(player.getX() + player.getWidth() / 2, player.getY() + player.getHeight() + 50),
-                        new Point2D.Double(player.getX() + player.getWidth() / 2, player.getY() + player.getHeight() - 50),
-                        Color.BLACK,
-                        Color.RED,
-                        15.0,
-                        4,
-                        player.getDirection()));
-            }
-            else if (player.getDirection() == Direction.DOWN_LEFT) {
-                contentPane.getGuiElements().add(new Laser(
-                        new Point2D.Double(player.getX() + 50, player.getY() + player.getHeight() - 50),
-                        new Point2D.Double(player.getX() - 50, player.getY() + player.getHeight() + 50),
-                        Color.BLACK,
-                        Color.RED,
-                        15.0,
-                        4,
-                        player.getDirection()));
-            }
-            else if (player.getDirection() == Direction.LEFT) {
-                contentPane.getGuiElements().add(new Laser(
-                        new Point2D.Double(player.getX() + 50, player.getY() + player.getHeight() / 2),
-                        new Point2D.Double(player.getX() - 50, player.getY() + player.getHeight() / 2),
-                        Color.BLACK,
-                        Color.RED,
-                        15.0,
-                        4,
-                        player.getDirection()));
-            }
-            else if (player.getDirection() == Direction.UP_LEFT) {
-                contentPane.getGuiElements().add(new Laser(
-                        new Point2D.Double(player.getX() + 50, player.getY() + 50),
-                        new Point2D.Double(player.getX() - 50, player.getY() - 50),
-                        Color.BLACK,
-                        Color.RED,
-                        15.0,
-                        4,
-                        player.getDirection()));
-            }
+        if (player.getStepsSinceShot() < (STEPS_PER_SEC / player.getFireRate())) {
+            player.setStepsSinceShot(player.getStepsSinceShot() + 1);
+        }
+        if (contentPane.getMouseClickX() > -1 && contentPane.getMouseClickY() > -1 &&
+                player.getStepsSinceShot() > (STEPS_PER_SEC / player.getFireRate()) - 1) {
+            controlComponent.performAction(new ShootAction(player, contentPane));
+            Logger.info("Steps last second " + player.getStepsSinceShot());
+            player.setStepsSinceShot(0);
+            Logger.info("Shoot");
         }
     }
 

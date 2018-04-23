@@ -4,10 +4,10 @@ import java.awt.event.*;
 
 public final class UIMouseListener implements MouseListener, MouseMotionListener, MouseWheelListener{
 
-    private double xPos = -1;
-    private double yPos = -1;
-    private double xPress = -1;
-    private double yPress = -1;
+    private volatile double xPos = -1;
+    private volatile double yPos = -1;
+    private volatile double xPress = -1;
+    private volatile double yPress = -1;
 
     @Override
     public void mousePressed(MouseEvent e) {

@@ -11,7 +11,14 @@ public class Player extends BBoxElement {
 
     private double hspeed;
     private double vspeed;
+    private double fireRate;
+    private double range;
+    private double shotSpeed;
+    private double bulletWidth;
+    private double bulletHeight;
     private int direction;
+    private int stepsSinceShot;
+
 
     /**
      * Constructor for custom color box player
@@ -24,6 +31,12 @@ public class Player extends BBoxElement {
         this.hspeed = speed;
         this.vspeed = speed;
         this.direction = Direction.UP;
+        this.fireRate = 1;
+        this.range = 1;
+        this.bulletWidth = 1;
+        this.bulletHeight = 25;
+        this.shotSpeed = 4;
+        this.stepsSinceShot = 0;
     }
 
     /**
@@ -36,6 +49,12 @@ public class Player extends BBoxElement {
         this.hspeed = speed;
         this.vspeed = speed;
         this.direction = Direction.UP;
+        this.fireRate = 1;
+        this.range = 1;
+        this.bulletWidth = 1;
+        this.bulletHeight = 25;
+        this.shotSpeed = 4;
+        this.stepsSinceShot = 0;
     }
 
     /**
@@ -48,6 +67,12 @@ public class Player extends BBoxElement {
         this.hspeed = 1;
         this.vspeed = 1;
         this.direction = Direction.UP;
+        this.fireRate = 1;
+        this.range = 1;
+        this.bulletWidth = 1;
+        this.bulletHeight = 25;
+        this.shotSpeed = 4;
+        this.stepsSinceShot = 0;
     }
 
     public double getHspeed() {
@@ -72,5 +97,57 @@ public class Player extends BBoxElement {
 
     public void setDirection(int direction) {
         this.direction = direction;
+    }
+
+    public double getFireRate() {
+        return fireRate;
+    }
+
+    public void setFireRate(double fireRate) {
+        this.fireRate = fireRate;
+    }
+
+    public double getRange() {
+        return range;
+    }
+
+    public void setRange(double range) {
+        this.range = range;
+    }
+
+    public double getbulletWidth() {
+        return bulletWidth;
+    }
+
+    public double getShotSpeed() {
+        return shotSpeed;
+    }
+
+    public void setShotSpeed(double shotSpeed) {
+        this.shotSpeed = shotSpeed;
+    }
+
+    public double getBulletWidth() {
+        return bulletWidth;
+    }
+
+    public void setBulletWidth(double bulletWidth) {
+        this.bulletWidth = bulletWidth;
+    }
+
+    public double getBulletHeight() {
+        return bulletHeight;
+    }
+
+    public void setBulletHeight(double bulletHeight) {
+        this.bulletHeight = bulletHeight;
+    }
+
+    public int getStepsSinceShot() {
+        return stepsSinceShot;
+    }
+
+    public void setStepsSinceShot(int stepsSinceShot) {
+        this.stepsSinceShot = stepsSinceShot;
     }
 }

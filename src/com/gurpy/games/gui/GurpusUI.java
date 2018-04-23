@@ -19,15 +19,15 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class GurpusUI extends JPanel {
     //Allow for easy scaling of UIElements.
     private final int MAX_FRAME_RATE = 120;
-    private long start = 0, diff, wait;
-    private int fps = 0;
+    private final long NANO_IN_SEC = 1000000000;
+    private long start = 0;
     private int numFramesInSecond = 0;
     private long lastFrameTime = 0;
+    private volatile int fps = 0;
     private CopyOnWriteArrayList<UIEntity> guiElements = new CopyOnWriteArrayList<>();
     private CopyOnWriteArrayList<Integer> keyCodes = new CopyOnWriteArrayList<>();
     private UIMouseListener uiMouseListener;
     private RenderingComponent renderingComponent;
-    //public final Dimension SCREEN_SIZE = Toolkit.getDefaultToolkit().getScreenSize();
 
     /**
      * Custom constructor for OSPanel Object.
@@ -56,12 +56,16 @@ public class GurpusUI extends JPanel {
         addKeyListener(new KeyListener() {
             @Override
             public void keyPressed(KeyEvent e) {
-                keyCodes.addIfAbsent(e.getKeyCode());
+                synchronized (GurpusUI.class) {
+                    keyCodes.addIfAbsent(e.getKeyCode());
+                }
             }
 
             @Override
             public void keyReleased(KeyEvent e) {
-                keyCodes.remove(keyCodes.indexOf(e.getKeyCode()));
+                synchronized (GurpusUI.class) {
+                    keyCodes.remove(keyCodes.indexOf(e.getKeyCode()));
+                }
             }
 
             @Override
@@ -126,7 +130,7 @@ public class GurpusUI extends JPanel {
                 5));
 
 
-        lastFrameTime = System.currentTimeMillis();
+        lastFrameTime = System.nanoTime();
 
     }
 
@@ -150,21 +154,19 @@ public class GurpusUI extends JPanel {
         //Method to update current FPS.
         checkFPS();
         capFrameRate();
+        Toolkit.getDefaultToolkit().sync();
         //Effectively recalls paintComponent(g);
         repaint();
     }
 
     private void capFrameRate() {
-        wait = 1000 / MAX_FRAME_RATE;
-        diff = System.currentTimeMillis() - start;
-        if (diff < wait) {
-            try {
-                Thread.sleep(wait - diff);
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
+        long diff, wait;
+        wait = NANO_IN_SEC / MAX_FRAME_RATE;
+        diff = System.nanoTime() - start;
+        while (diff < wait) {
+            diff = System.nanoTime() - start;
         }
-        start = System.currentTimeMillis();
+        start = System.nanoTime();
     }
 
     public CopyOnWriteArrayList<UIEntity> getGuiElements() {
@@ -200,9 +202,9 @@ public class GurpusUI extends JPanel {
     }
 
     private void checkFPS() {
-        long currentFrameTime = System.currentTimeMillis();
+        long currentFrameTime = System.nanoTime();
         numFramesInSecond++;
-        if (currentFrameTime - lastFrameTime >= 1000) {
+        if (currentFrameTime - lastFrameTime >= NANO_IN_SEC) {
             fps = numFramesInSecond;
             lastFrameTime = currentFrameTime;
             numFramesInSecond = 0;

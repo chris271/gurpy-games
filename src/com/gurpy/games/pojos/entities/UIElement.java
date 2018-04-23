@@ -11,12 +11,12 @@ import java.awt.geom.Point2D;
 
 public abstract class UIElement implements UIEntity{
 
-    private double xLoc, yLoc;
+    private volatile double xLoc, yLoc;
+    private volatile boolean display;
+    private double borderThickness;
     private int type;
     private Color borderColor;
     private Color bgColor;
-    private double borderThickness;
-    private boolean display;
 
     /**
      * Contructor used for custom UI element.
@@ -120,6 +120,11 @@ public abstract class UIElement implements UIEntity{
     public void setPosition(Point2D position) {
         xLoc = position.getX();
         yLoc = position.getY();
+    }
+
+    @Override
+    public Point2D getPosition() {
+        return new Point2D.Double(this.getX(), this.getY());
     }
 
     @Override
