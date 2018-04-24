@@ -40,4 +40,14 @@ public final class Menu extends UIElement{
         this.selectedItem = selectedItem;
     }
 
+    @Override
+    public void setPosition(Point2D position) {
+        for (MenuItem item : menuItems) {
+            item.setX(item.getX() + (position.getX() - getPosition().getX()));
+            item.setY(item.getY() + (position.getY() - getPosition().getY()));
+        }
+        title.setX(title.getX() + (position.getX() - getPosition().getX()));
+        title.setY(title.getY() + (position.getY() - getPosition().getY()));
+        super.setPosition(position);
+    }
 }

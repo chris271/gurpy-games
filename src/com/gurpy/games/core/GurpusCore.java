@@ -1,12 +1,10 @@
 package com.gurpy.games.core;
 
 import com.gurpy.games.gui.GurpusUI;
-import com.gurpy.games.pojos.action.CollisionAction;
-import com.gurpy.games.pojos.action.DestroyAction;
-import com.gurpy.games.pojos.action.ShootAction;
-import com.gurpy.games.pojos.action.TranslationAction;
+import com.gurpy.games.pojos.action.*;
 import com.gurpy.games.pojos.component.ControlComponent;
 import com.gurpy.games.pojos.component.PhysicsComponent;
+import com.gurpy.games.pojos.control.Camera;
 import com.gurpy.games.pojos.control.Direction;
 import com.gurpy.games.pojos.entities.*;
 import com.gurpy.games.pojos.entities.Menu;
@@ -37,7 +35,7 @@ public class GurpusCore implements Runnable{
 
         final long NANO_IN_MILLI = 1000000;
 
-        final long STEP_TIME = 10 * NANO_IN_MILLI;
+        final long STEP_TIME = 5 * NANO_IN_MILLI;
         Logger.info("Running on " + OS);
 
         while (contentPane.isShowing()) {
@@ -58,45 +56,49 @@ public class GurpusCore implements Runnable{
 
     private void updateCurrentState() {
         //Iterate over each element.
-        for (Entity e : contentPane.getGuiElements()) {
-            //Check collisions
-            for (UIEntity other : contentPane.getGuiElements()) {
-                controlComponent.performAction(new CollisionAction((UIEntity)e, other));
+        for (UIElement e : contentPane.getGuiElements()) {
+            //Check if element is marked for destruction.
+            if (e.isDestroy()) {
+                controlComponent.performAction(new DestroyAction(e, contentPane));
+                continue;
             }
-            //Check input and update physics.
+            //Check collisions with other elements.
+            for (UIEntity other : contentPane.getGuiElements()) {
+                controlComponent.performAction(new CollisionAction(e, other));
+            }
+            //Check user input and update physics.
             if (e instanceof BBoxPlayer) {
                 BBoxPlayer player = (BBoxPlayer) e;
                 if (!isMenu) {
-                    checkPlayerInput(player);
+                    if (player.isControllable()) {
+                        checkPlayerInput(player);
+                    } else {
+                        //Player is AI controlled.
+                    }
                     player.setDisplay(true);
                 } else {
                     player.setDisplay(false);
                 }
-                for (UIEntity collision : player.getCollisions()) {
-                    if (collision instanceof Laser) {
-                        player.setDisplay(false);
-                    }
-                }
-                player.getCollisions().clear();
+                checkPlayerCollisions(player);
             }
             if (e instanceof Laser) {
                 Laser laser = (Laser) e;
                 if (!isMenu) {
                     laser.setDisplay(true);
-                    updateLaserMovement(laser);
-                    updateLaserState(laser);
+                    physicsComponent.performAction(new UpdateLaserAction(laser, contentPane));
                 } else {
                     laser.setDisplay(false);
                 }
+
             }
             if (e instanceof TextElement) {
                 TextElement textElement = (TextElement)e;
                 if (textElement.getText().contains("FPS")) {
                     textElement.setText("FPS: " + contentPane.getFps());
                 } else if (!isMenu) {
-                    ((TextElement)e).setDisplay(true);
+                    e.setDisplay(true);
                 } else {
-                    ((TextElement)e).setDisplay(false);
+                    e.setDisplay(false);
                 }
             }
             if (e instanceof Menu) {
@@ -117,10 +119,33 @@ public class GurpusCore implements Runnable{
                     if (contentPane.getKeyCodes().contains(KeyEvent.VK_ESCAPE)) {
                         contentPane.setBackground(Color.BLACK);
                         isMenu = true;
-                        ((Menu)e).setDisplay(true);
+                        e.setDisplay(true);
                     }
                 }
             }
+        }
+
+        detectWindowChanges();
+
+    }
+
+    private void detectWindowChanges() {
+        //On window resize update element draw positions...
+        if (contentPane.getCurrentWidth() != contentPane.getWidth() || contentPane.getCurrentHeight() != contentPane.getHeight()) {
+            for (UIElement e : contentPane.getGuiElements()) {
+                if (!(e instanceof TextElement && ((TextElement) e).getText().contains("FPS"))) {
+                    physicsComponent.performAction(new TranslationAction(e, new Point2D.Double(
+                        e.getX() + (contentPane.getWidth() - contentPane.getCurrentWidth()) / 2.0,
+                        e.getY() + (contentPane.getHeight() - contentPane.getCurrentHeight()) / 2.0)));
+
+                }
+            }
+            contentPane.setCurrentWidth(contentPane.getWidth());
+            contentPane.setCurrentHeight(contentPane.getHeight());
+            contentPane.setCamera(new Camera(0, contentPane.getCurrentWidth(),
+                    0, contentPane.getCurrentHeight(),
+                    contentPane.MIN_X, contentPane.MAX_X - contentPane.MIN_X,
+                    contentPane.MIN_Y, contentPane.MAX_Y - contentPane.MIN_Y));
         }
 
         if (!contentPane.isShowing()) {
@@ -129,12 +154,13 @@ public class GurpusCore implements Runnable{
         }
     }
 
-    private void updateLaserState(Laser laser) {
-        laser.setStepsAlive(laser.getStepsAlive() + 1);
-        if (laser.getOwner() instanceof BBoxPlayer &&
-                laser.getStepsAlive() > ((BBoxPlayer)laser.getOwner()).getRange() * STEPS_PER_SEC - 1) {
-            controlComponent.performAction(new DestroyAction(laser, contentPane));
+    private void checkPlayerCollisions(BBoxPlayer player) {
+        for (UIEntity collision : player.getCollisions()) {
+            if (collision instanceof Laser && !((Laser)collision).getOwner().equals(player)) {
+                player.setDestroy(true);
+            }
         }
+        player.getCollisions().clear();
     }
 
     private void checkMenuItem(Menu menu, MenuItem item) {
@@ -161,135 +187,125 @@ public class GurpusCore implements Runnable{
         }
     }
 
-    private void updateLaserMovement(Laser laser) {
-        int laserDir = laser.getDirection();
-        TranslationAction translationAction = new TranslationAction(laser, new Point2D.Double(0, 0));
-        switch (laserDir) {
-            case Direction.UP:
-                translationAction.setPosition(new Point2D.Double(laser.getLines().get(0).getP1().getX(),
-                        laser.getLines().get(0).getP1().getY() - laser.getVspeed()));
-                break;
-            case Direction.UP_RIGHT:
-                translationAction.setPosition(new Point2D.Double(laser.getLines().get(0).getP1().getX() + laser.getHspeed() / 2,
-                        laser.getLines().get(0).getP1().getY() - laser.getVspeed() / 2));
-                break;
-            case Direction.RIGHT:
-                translationAction.setPosition(new Point2D.Double(laser.getLines().get(0).getP1().getX() + laser.getHspeed(),
-                        laser.getLines().get(0).getP1().getY()));
-                break;
-            case Direction.DOWN_RIGHT:
-                translationAction.setPosition(new Point2D.Double(laser.getLines().get(0).getP1().getX() + laser.getHspeed() / 2,
-                        laser.getLines().get(0).getP1().getY() + laser.getVspeed() / 2));
-                break;
-            case Direction.DOWN:
-                translationAction.setPosition(new Point2D.Double(laser.getLines().get(0).getP1().getX(),
-                        laser.getLines().get(0).getP1().getY() + laser.getVspeed()));
-                break;
-            case Direction.DOWN_LEFT:
-                translationAction.setPosition(new Point2D.Double(laser.getLines().get(0).getP1().getX() - laser.getHspeed() / 2,
-                        laser.getLines().get(0).getP1().getY() + laser.getVspeed() / 2));
-                break;
-            case Direction.LEFT:
-                translationAction.setPosition(new Point2D.Double(laser.getLines().get(0).getP1().getX() - laser.getHspeed(),
-                        laser.getLines().get(0).getP1().getY()));
-                break;
-            case Direction.UP_LEFT:
-                translationAction.setPosition(new Point2D.Double(laser.getLines().get(0).getP1().getX() - laser.getHspeed() / 2,
-                        laser.getLines().get(0).getP1().getY() - laser.getVspeed() / 2));
-                break;
-            default:
-                translationAction.setPosition(new Point2D.Double(laser.getLines().get(0).getP1().getX(),
-                        laser.getLines().get(0).getP1().getY() - laser.getVspeed()));
-                break;
-        }
-        physicsComponent.performAction(translationAction);
-    }
-
     private void checkPlayerInput(BBoxPlayer player) {
 
+        for (Integer i : contentPane.getKeyCodes()) {
+            Logger.info("Key: " + i);
+        }
         //Movement
-        if (contentPane.getKeyCodes().size() > 2) {
+        if (contentPane.getKeyCodes().contains(KeyEvent.VK_W) &&
+                        contentPane.getKeyCodes().contains(KeyEvent.VK_D)) {
 
-            player.setDirection(Direction.UP);
-
-        } else if ((contentPane.getKeyCodes().contains(KeyEvent.VK_UP) &&
-                contentPane.getKeyCodes().contains(KeyEvent.VK_RIGHT)) ||
-                (contentPane.getKeyCodes().contains(KeyEvent.VK_W) &&
-                        contentPane.getKeyCodes().contains(KeyEvent.VK_D))) {
-
-            physicsComponent.performAction(new TranslationAction(player,
-                    new Point2D.Double(player.getX() + player.getHspeed() / 2, player.getY() - player.getVspeed() / 2)));
+            physicsComponent.performAction(new MoveFocusedAction(player, contentPane.getCamera(),
+                    contentPane.getGuiElements(), player.getHspeed() / 2, -(player.getVspeed() / 2)));
             player.setDirection(Direction.UP_RIGHT);
 
         }
-        else if ((contentPane.getKeyCodes().contains(KeyEvent.VK_UP) &&
-                contentPane.getKeyCodes().contains(KeyEvent.VK_LEFT)) ||
-                (contentPane.getKeyCodes().contains(KeyEvent.VK_W) &&
-                        contentPane.getKeyCodes().contains(KeyEvent.VK_A))) {
+        else if (contentPane.getKeyCodes().contains(KeyEvent.VK_W) &&
+                        contentPane.getKeyCodes().contains(KeyEvent.VK_A)) {
 
-            physicsComponent.performAction(new TranslationAction(player,
-                    new Point2D.Double(player.getX() - player.getHspeed() / 2, player.getY() - player.getVspeed() / 2)));
+            physicsComponent.performAction(new MoveFocusedAction(player, contentPane.getCamera(),
+                    contentPane.getGuiElements(), -(player.getHspeed() / 2), -(player.getVspeed() / 2)));
             player.setDirection(Direction.UP_LEFT);
 
         }
-        else if ((contentPane.getKeyCodes().contains(KeyEvent.VK_DOWN) &&
-                contentPane.getKeyCodes().contains(KeyEvent.VK_RIGHT)) ||
-                (contentPane.getKeyCodes().contains(KeyEvent.VK_S) &&
-                        contentPane.getKeyCodes().contains(KeyEvent.VK_D))) {
+        else if (contentPane.getKeyCodes().contains(KeyEvent.VK_S) &&
+                        contentPane.getKeyCodes().contains(KeyEvent.VK_D)) {
 
-            physicsComponent.performAction(new TranslationAction(player,
-                    new Point2D.Double(player.getX() + player.getHspeed() / 2, player.getY() + player.getVspeed() / 2)));
+            physicsComponent.performAction(new MoveFocusedAction(player, contentPane.getCamera(),
+                    contentPane.getGuiElements(), player.getHspeed() / 2, player.getVspeed() / 2));
             player.setDirection(Direction.DOWN_RIGHT);
 
         }
-        else if ((contentPane.getKeyCodes().contains(KeyEvent.VK_DOWN) &&
-                contentPane.getKeyCodes().contains(KeyEvent.VK_LEFT)) ||
-                (contentPane.getKeyCodes().contains(KeyEvent.VK_S) &&
-                        contentPane.getKeyCodes().contains(KeyEvent.VK_A))) {
+        else if (contentPane.getKeyCodes().contains(KeyEvent.VK_S) &&
+                        contentPane.getKeyCodes().contains(KeyEvent.VK_A)) {
 
-            physicsComponent.performAction(new TranslationAction(player,
-                    new Point2D.Double(player.getX() - player.getHspeed() / 2, player.getY() + player.getVspeed() / 2)));
+            physicsComponent.performAction(new MoveFocusedAction(player, contentPane.getCamera(),
+                    contentPane.getGuiElements(), -(player.getHspeed() / 2), player.getVspeed() / 2));
             player.setDirection(Direction.DOWN_LEFT);
 
         }
-        else if (contentPane.getKeyCodes().contains(KeyEvent.VK_UP)||
-                contentPane.getKeyCodes().contains(KeyEvent.VK_W)) {
+        else if (contentPane.getKeyCodes().contains(KeyEvent.VK_W)) {
 
-            physicsComponent.performAction(new TranslationAction(player,
-                    new Point2D.Double(player.getX(), player.getY() - player.getVspeed())));
+            physicsComponent.performAction(new MoveFocusedAction(player, contentPane.getCamera(),
+                    contentPane.getGuiElements(), 0, -(player.getVspeed())));
             player.setDirection(Direction.UP);
 
         }
-        else if (contentPane.getKeyCodes().contains(KeyEvent.VK_RIGHT)||
-                contentPane.getKeyCodes().contains(KeyEvent.VK_D)) {
+        else if (contentPane.getKeyCodes().contains(KeyEvent.VK_D)) {
 
-            physicsComponent.performAction(new TranslationAction(player,
-                    new Point2D.Double(player.getX() + player.getHspeed(), player.getY())));
+            physicsComponent.performAction(new MoveFocusedAction(player, contentPane.getCamera(),
+                    contentPane.getGuiElements(), player.getHspeed(), 0));
             player.setDirection(Direction.RIGHT);
 
         }
-        else if (contentPane.getKeyCodes().contains(KeyEvent.VK_DOWN)||
-                contentPane.getKeyCodes().contains(KeyEvent.VK_S)) {
+        else if (contentPane.getKeyCodes().contains(KeyEvent.VK_S)) {
 
-            physicsComponent.performAction(new TranslationAction(player,
-                    new Point2D.Double(player.getX(), player.getY() + player.getVspeed())));
+            physicsComponent.performAction(new MoveFocusedAction(player, contentPane.getCamera(),
+                    contentPane.getGuiElements(), 0, player.getVspeed()));
             player.setDirection(Direction.DOWN);
 
         }
-        else if (contentPane.getKeyCodes().contains(KeyEvent.VK_LEFT)||
-                contentPane.getKeyCodes().contains(KeyEvent.VK_A)) {
+        else if (contentPane.getKeyCodes().contains(KeyEvent.VK_A)) {
 
-            physicsComponent.performAction(new TranslationAction(player,
-                    new Point2D.Double(player.getX() - player.getHspeed(), player.getY())));
+            physicsComponent.performAction(new MoveFocusedAction(player, contentPane.getCamera(),
+                    contentPane.getGuiElements(), -(player.getHspeed()), 0));
             player.setDirection(Direction.LEFT);
 
         }
+
         //Shooting
+        int shootDir = -1;
+        if (contentPane.getKeyCodes().contains(KeyEvent.VK_UP) &&
+                contentPane.getKeyCodes().contains(KeyEvent.VK_RIGHT)) {
+
+            shootDir = Direction.UP_RIGHT;
+
+        }
+        else if (contentPane.getKeyCodes().contains(KeyEvent.VK_UP) &&
+                contentPane.getKeyCodes().contains(KeyEvent.VK_LEFT)) {
+
+            shootDir = Direction.UP_LEFT;
+
+        }
+        else if (contentPane.getKeyCodes().contains(KeyEvent.VK_DOWN) &&
+                contentPane.getKeyCodes().contains(KeyEvent.VK_RIGHT)) {
+
+            shootDir = Direction.DOWN_RIGHT;
+
+        }
+        else if (contentPane.getKeyCodes().contains(KeyEvent.VK_DOWN) &&
+                contentPane.getKeyCodes().contains(KeyEvent.VK_LEFT)) {
+
+            shootDir = Direction.DOWN_LEFT;
+
+        }
+        else if (contentPane.getKeyCodes().contains(KeyEvent.VK_UP)) {
+
+            shootDir = Direction.UP;
+
+        }
+        else if (contentPane.getKeyCodes().contains(KeyEvent.VK_RIGHT)) {
+
+            shootDir = Direction.RIGHT;
+
+        }
+        else if (contentPane.getKeyCodes().contains(KeyEvent.VK_DOWN)) {
+
+            shootDir = Direction.DOWN;
+
+        }
+        else if (contentPane.getKeyCodes().contains(KeyEvent.VK_LEFT)) {
+
+            shootDir = Direction.LEFT;
+
+        }
+
         if (player.getStepsSinceShot() < (STEPS_PER_SEC / player.getFireRate())) {
             player.setStepsSinceShot(player.getStepsSinceShot() + 1);
         }
-        if (selectInput() && player.getStepsSinceShot() > (STEPS_PER_SEC / player.getFireRate()) - 1) {
-            controlComponent.performAction(new ShootAction(player, contentPane));
+        if (shootDir > -1 && player.getStepsSinceShot() > (STEPS_PER_SEC / player.getFireRate()) - 1) {
+            controlComponent.performAction(new ShootAction(player, contentPane, shootDir));
             player.setStepsSinceShot(0);
         }
     }
@@ -299,6 +315,8 @@ public class GurpusCore implements Runnable{
                 contentPane.getKeyCodes().contains(KeyEvent.VK_ENTER) ||
                 contentPane.getKeyCodes().contains(KeyEvent.VK_SPACE);
     }
+
+
 
 }
 

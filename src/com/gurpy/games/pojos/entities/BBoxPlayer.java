@@ -9,6 +9,9 @@ import java.util.ArrayList;
 
 public class BBoxPlayer extends BBoxElement {
 
+    private boolean controllable;
+    private boolean focused;
+    private boolean doubleShot;
     private double hspeed;
     private double vspeed;
     private double fireRate;
@@ -19,6 +22,10 @@ public class BBoxPlayer extends BBoxElement {
     private int direction;
     private int stepsSinceShot;
     private int numBullets;
+    private Color laserBorder;
+    private Color laserColor;
+    private double relativeX;
+    private double relativeY;
 
     /**
      * Constructor for custom color box player
@@ -33,11 +40,18 @@ public class BBoxPlayer extends BBoxElement {
         this.direction = Direction.UP;
         this.fireRate = 2;
         this.range = 1;
-        this.bulletWidth = 3;
+        this.bulletWidth = 5;
         this.bulletHeight = 25;
         this.shotSpeed = 20;
         this.stepsSinceShot = 0;
         this.numBullets = 1;
+        this.laserBorder = borderColor;
+        this.laserColor = bgColor;
+        this.controllable = false;
+        this.focused = false;
+        this.relativeX = position.getX();
+        this.relativeY = position.getY();
+        this.doubleShot = false;
     }
 
     /**
@@ -52,11 +66,18 @@ public class BBoxPlayer extends BBoxElement {
         this.direction = Direction.UP;
         this.fireRate = 2;
         this.range = 1;
-        this.bulletWidth = 1;
+        this.bulletWidth = 5;
         this.bulletHeight = 25;
         this.shotSpeed = 20;
         this.stepsSinceShot = 0;
         this.numBullets = 1;
+        this.laserBorder = color;
+        this.laserColor = color;
+        this.controllable = false;
+        this.focused = false;
+        this.relativeX = position.getX();
+        this.relativeY = position.getY();
+        this.doubleShot = false;
     }
 
     /**
@@ -71,11 +92,18 @@ public class BBoxPlayer extends BBoxElement {
         this.direction = Direction.UP;
         this.fireRate = 2;
         this.range = 1;
-        this.bulletWidth = 1;
+        this.bulletWidth = 5;
         this.bulletHeight = 25;
         this.shotSpeed = 20 ;
         this.stepsSinceShot = 0;
         this.numBullets = 1;
+        this.laserBorder = Color.GREEN;
+        this.laserColor = Color.YELLOW;
+        this.controllable = false;
+        this.focused = false;
+        this.relativeX = position.getX();
+        this.relativeY = position.getY();
+        this.doubleShot = false;
     }
 
     public double getHspeed() {
@@ -160,5 +188,61 @@ public class BBoxPlayer extends BBoxElement {
 
     public void setNumBullets(int numBullets) {
         this.numBullets = numBullets;
+    }
+
+    public Color getLaserBorder() {
+        return laserBorder;
+    }
+
+    public void setLaserBorder(Color laserBorder) {
+        this.laserBorder = laserBorder;
+    }
+
+    public Color getLaserColor() {
+        return laserColor;
+    }
+
+    public void setLaserColor(Color laserColor) {
+        this.laserColor = laserColor;
+    }
+
+    public boolean isControllable() {
+        return controllable;
+    }
+
+    public void setControllable(boolean controllable) {
+        this.controllable = controllable;
+    }
+
+    public boolean isFocused() {
+        return focused;
+    }
+
+    public void setFocused(boolean focused) {
+        this.focused = focused;
+    }
+
+    public double getRelativeX() {
+        return relativeX;
+    }
+
+    public void setRelativeX(double relativeX) {
+        this.relativeX = relativeX;
+    }
+
+    public double getRelativeY() {
+        return relativeY;
+    }
+
+    public void setRelativeY(double relativeY) {
+        this.relativeY = relativeY;
+    }
+
+    public boolean isDoubleShot() {
+        return doubleShot;
+    }
+
+    public void setDoubleShot(boolean doubleShot) {
+        this.doubleShot = doubleShot;
     }
 }

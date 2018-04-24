@@ -14,6 +14,7 @@ public abstract class UIElement implements UIEntity{
 
     private volatile double xLoc, yLoc;
     private volatile boolean display;
+    private volatile boolean destroy;
     private double borderThickness;
     private int type;
     private Color borderColor;
@@ -34,7 +35,7 @@ public abstract class UIElement implements UIEntity{
         this.bgColor = bgColor;
         this.type = type;
         this.borderThickness = borderThickness;
-        collisions = new ArrayList<>();
+        this.collisions = new ArrayList<>();
     }
 
     /**
@@ -50,7 +51,7 @@ public abstract class UIElement implements UIEntity{
         this.bgColor = color;
         this.type = type;
         this.borderThickness = 0.0;
-        collisions = new ArrayList<>();
+        this.collisions = new ArrayList<>();
     }
 
     /**
@@ -65,7 +66,7 @@ public abstract class UIElement implements UIEntity{
         this.bgColor = Color.BLACK;
         this.type = type;
         this.borderThickness = 0.0;
-        collisions = new ArrayList<>();
+        this.collisions = new ArrayList<>();
     }
 
     /**
@@ -77,9 +78,9 @@ public abstract class UIElement implements UIEntity{
         this.yLoc = position.getY();
         this.borderColor = Color.BLACK;
         this.bgColor = Color.BLACK;
-        type = EntityTypes.DEFAULT;
+        this.type = EntityTypes.DEFAULT;
         this.borderThickness = 0.0;
-        collisions = new ArrayList<>();
+        this.collisions = new ArrayList<>();
     }
 
     @Override
@@ -173,5 +174,13 @@ public abstract class UIElement implements UIEntity{
 
     public void addCollision(UIEntity collision) {
         collisions.add(collision);
+    }
+
+    public boolean isDestroy() {
+        return destroy;
+    }
+
+    public void setDestroy(boolean destroy) {
+        this.destroy = destroy;
     }
 }

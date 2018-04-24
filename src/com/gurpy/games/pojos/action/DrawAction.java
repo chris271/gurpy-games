@@ -12,7 +12,7 @@ public class DrawAction extends UIAction {
 
     private Graphics2D g2d;
 
-    public DrawAction(UIEntity owner, Graphics2D g2d) {
+    public DrawAction(UIElement owner, Graphics2D g2d) {
         super(owner);
         this.g2d = g2d;
     }

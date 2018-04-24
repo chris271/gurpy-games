@@ -2,6 +2,7 @@ package com.gurpy.games.gui;
 
 import com.gurpy.games.pojos.action.DrawAction;
 import com.gurpy.games.pojos.component.RenderingComponent;
+import com.gurpy.games.pojos.control.Camera;
 import com.gurpy.games.pojos.control.UIMouseListener;
 import com.gurpy.games.pojos.entities.*;
 import com.gurpy.games.pojos.entities.Menu;
@@ -18,12 +19,19 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class GurpusUI extends JPanel {
     //Allow for easy scaling of UIElements.
     private final int MAX_FRAME_RATE = 120;
+    public final int MIN_X = -1000;
+    public final int MIN_Y = -1000;
+    public final int MAX_X = 1000;
+    public final int MAX_Y = 1000;
     private final long NANO_IN_SEC = 1000000000;
     private long start = 0;
-    private int numFramesInSecond = 0;
     private long lastFrameTime = 0;
+    private int numFramesInSecond = 0;
+    private volatile int currentWidth = 0;
+    private volatile int currentHeight = 0;
     private volatile int fps = 0;
-    private CopyOnWriteArrayList<UIEntity> guiElements = new CopyOnWriteArrayList<>();
+    private volatile Camera camera;
+    private CopyOnWriteArrayList<UIElement> guiElements = new CopyOnWriteArrayList<>();
     private CopyOnWriteArrayList<Integer> keyCodes = new CopyOnWriteArrayList<>();
     private UIMouseListener uiMouseListener;
     private RenderingComponent renderingComponent;
@@ -40,13 +48,14 @@ public class GurpusUI extends JPanel {
         this.setBackground(Color.BLACK);
         this.setPreferredSize(new Dimension(600, 600));
         this.setDoubleBuffered(true);
+        currentWidth = getPreferredSize().getSize().width;
+        currentHeight = getPreferredSize().getSize().height;
 
         //Add custom MouseListeners.
         uiMouseListener = new UIMouseListener();
         addMouseListener(uiMouseListener);
         addMouseMotionListener(uiMouseListener);
         addMouseWheelListener(uiMouseListener);
-
         //KeyListeners only work on focused windows.
         this.setFocusable(true);
         this.requestFocusInWindow();
@@ -120,15 +129,30 @@ public class GurpusUI extends JPanel {
                 "Gurpus Maximus",
                 24);
         addGuiElement(new Menu(menuTitle, menuItems, true));
-        addGuiElement(new BBoxPlayer(
+        BBoxPlayer player = new BBoxPlayer(
                 new Point2D.Double(getPreferredSize().getWidth() / 2 - 50, getPreferredSize().getHeight() / 2 - 50),
                 new Dimension(100 * SCALING, 100 * SCALING),
                 Color.BLACK,
                 Color.RED,
                 15.0,
-                5));
+                5);
+        player.setLaserColor(Color.CYAN);
+        player.setLaserColor(Color.BLUE);
+        player.setNumBullets(3);
+        player.setControllable(true);
+        player.setFocused(true);
+        player.setDoubleShot(true);
+        addGuiElement(player);
+        addGuiElement(new BBoxEnemy(
+                new Point2D.Double(0, 0),
+                new Dimension(100 * SCALING, 100 * SCALING),
+                Color.BLACK,
+                Color.YELLOW,
+                15.0,
+                5,
+                EnemyTypes.DUMMY));
 
-
+        camera = new Camera(0, currentWidth, 0, currentHeight, MIN_X, MAX_X - MIN_X, MIN_Y, MAX_Y - MIN_Y);
         lastFrameTime = System.nanoTime();
 
     }
@@ -145,9 +169,9 @@ public class GurpusUI extends JPanel {
         super.paintComponent(g2d);
         //Iterate over the GUI in order to repaint changes.
         //Iterate through each UIElement.
-        for (UIEntity uiEntity : guiElements) {
-            if (uiEntity.isDisplay())
-                renderingComponent.performAction(new DrawAction(uiEntity, g2d));
+        for (UIElement uiElement : guiElements) {
+            if (uiElement.isDisplay())
+                renderingComponent.performAction(new DrawAction(uiElement, g2d));
         }
 
         //Method to update current FPS.
@@ -168,12 +192,12 @@ public class GurpusUI extends JPanel {
         start = System.nanoTime();
     }
 
-    public CopyOnWriteArrayList<UIEntity> getGuiElements() {
+    public CopyOnWriteArrayList<UIElement> getGuiElements() {
         return guiElements;
     }
 
-    private void addGuiElement(UIEntity uiEntity) {
-        guiElements.add(uiEntity);
+    private void addGuiElement(UIElement uiElement) {
+        guiElements.add(uiElement);
     }
 
     public CopyOnWriteArrayList<Integer> getKeyCodes(){
@@ -194,6 +218,30 @@ public class GurpusUI extends JPanel {
 
     public double getMouseClickY(){
         return uiMouseListener.getyPress();
+    }
+
+    public int getCurrentWidth() {
+        return currentWidth;
+    }
+
+    public void setCurrentWidth(int currentWidth) {
+        this.currentWidth = currentWidth;
+    }
+
+    public int getCurrentHeight() {
+        return currentHeight;
+    }
+
+    public void setCurrentHeight(int currentHeight) {
+        this.currentHeight = currentHeight;
+    }
+
+    public Camera getCamera() {
+        return camera;
+    }
+
+    public void setCamera(Camera camera) {
+        this.camera = camera;
     }
 
     public int getFps() {
