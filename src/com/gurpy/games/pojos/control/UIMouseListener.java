@@ -39,7 +39,8 @@ public final class UIMouseListener implements MouseListener, MouseMotionListener
 
     @Override
     public void mouseDragged(MouseEvent e) {
-        //Not implemented...
+        xPos = e.getX();
+        yPos = e.getY();
     }
 
     @Override

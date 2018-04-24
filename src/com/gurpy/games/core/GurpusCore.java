@@ -10,6 +10,7 @@ import com.gurpy.games.pojos.entities.*;
 import com.gurpy.games.pojos.entities.Menu;
 import com.gurpy.games.pojos.entities.MenuItem;
 import com.gurpy.games.utils.Logger;
+import com.gurpy.games.utils.UtilFunctions;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -111,7 +112,7 @@ public class GurpusCore implements Runnable{
                         } else {
                             item.setSelected(false);
                         }
-                        if (item.isSelected() && selectInput()) {
+                        if (item.isSelected() && mouseClick()) {
                             checkMenuItem(menu, item);
                         }
                     }
@@ -256,50 +257,79 @@ public class GurpusCore implements Runnable{
 
         //Shooting
         int shootDir = -1;
-        if (contentPane.getKeyCodes().contains(KeyEvent.VK_UP) &&
-                contentPane.getKeyCodes().contains(KeyEvent.VK_RIGHT)) {
+        if (!mouseClick()) {
+            if (contentPane.getKeyCodes().contains(KeyEvent.VK_UP) &&
+                    contentPane.getKeyCodes().contains(KeyEvent.VK_RIGHT)) {
 
-            shootDir = Direction.UP_RIGHT;
+                shootDir = Direction.UP_RIGHT;
 
+            }
+            else if (contentPane.getKeyCodes().contains(KeyEvent.VK_UP) &&
+                    contentPane.getKeyCodes().contains(KeyEvent.VK_LEFT)) {
+
+                shootDir = Direction.UP_LEFT;
+
+            }
+            else if (contentPane.getKeyCodes().contains(KeyEvent.VK_DOWN) &&
+                    contentPane.getKeyCodes().contains(KeyEvent.VK_RIGHT)) {
+
+                shootDir = Direction.DOWN_RIGHT;
+
+            }
+            else if (contentPane.getKeyCodes().contains(KeyEvent.VK_DOWN) &&
+                    contentPane.getKeyCodes().contains(KeyEvent.VK_LEFT)) {
+
+                shootDir = Direction.DOWN_LEFT;
+
+            }
+            else if (contentPane.getKeyCodes().contains(KeyEvent.VK_UP)) {
+
+                shootDir = Direction.UP;
+
+            }
+            else if (contentPane.getKeyCodes().contains(KeyEvent.VK_RIGHT)) {
+
+                shootDir = Direction.RIGHT;
+
+            }
+            else if (contentPane.getKeyCodes().contains(KeyEvent.VK_DOWN)) {
+
+                shootDir = Direction.DOWN;
+
+            }
+            else if (contentPane.getKeyCodes().contains(KeyEvent.VK_LEFT)) {
+
+                shootDir = Direction.LEFT;
+
+            }
+        } else {
+            float angle = UtilFunctions.getAngle(
+                    new Point2D.Double(contentPane.getMouseX(), contentPane.getMouseY()),
+                    new Point2D.Double(player.getX() + player.getWidth() / 2, player.getY() + player.getHeight() / 2));
+            if (angle < 22.5) {
+                shootDir = Direction.LEFT;
+            } else if (angle < 67.5) {
+                shootDir = Direction.UP_LEFT;
+            } else if (angle < 112.5) {
+                shootDir = Direction.UP;
+            } else if (angle < 157.5) {
+                shootDir = Direction.UP_RIGHT;
+            } else if (angle < 202.5) {
+                shootDir = Direction.RIGHT;
+            } else if (angle < 247.5) {
+                shootDir = Direction.DOWN_RIGHT;
+            } else if (angle < 292.5) {
+                shootDir = Direction.DOWN;
+            } else if (angle < 337.5) {
+                shootDir = Direction.DOWN_LEFT;
+            } else{
+                shootDir = Direction.LEFT;
+            }
         }
-        else if (contentPane.getKeyCodes().contains(KeyEvent.VK_UP) &&
-                contentPane.getKeyCodes().contains(KeyEvent.VK_LEFT)) {
-
-            shootDir = Direction.UP_LEFT;
-
-        }
-        else if (contentPane.getKeyCodes().contains(KeyEvent.VK_DOWN) &&
-                contentPane.getKeyCodes().contains(KeyEvent.VK_RIGHT)) {
-
-            shootDir = Direction.DOWN_RIGHT;
-
-        }
-        else if (contentPane.getKeyCodes().contains(KeyEvent.VK_DOWN) &&
-                contentPane.getKeyCodes().contains(KeyEvent.VK_LEFT)) {
-
-            shootDir = Direction.DOWN_LEFT;
-
-        }
-        else if (contentPane.getKeyCodes().contains(KeyEvent.VK_UP)) {
-
-            shootDir = Direction.UP;
-
-        }
-        else if (contentPane.getKeyCodes().contains(KeyEvent.VK_RIGHT)) {
-
-            shootDir = Direction.RIGHT;
-
-        }
-        else if (contentPane.getKeyCodes().contains(KeyEvent.VK_DOWN)) {
-
-            shootDir = Direction.DOWN;
-
-        }
-        else if (contentPane.getKeyCodes().contains(KeyEvent.VK_LEFT)) {
-
-            shootDir = Direction.LEFT;
-
-        }
+        Logger.info("Mouse Click X: " + contentPane.getMouseClickX());
+        Logger.info("Mouse Click Y: " + contentPane.getMouseClickY());
+        Logger.info("Mouse X: " + contentPane.getMouseX());
+        Logger.info("Mouse Y: " + contentPane.getMouseY());
 
         if (player.getStepsSinceShot() < (STEPS_PER_SEC / player.getFireRate())) {
             player.setStepsSinceShot(player.getStepsSinceShot() + 1);
@@ -310,10 +340,8 @@ public class GurpusCore implements Runnable{
         }
     }
 
-    private boolean selectInput() {
-        return (contentPane.getMouseClickX() > -1 && contentPane.getMouseClickY() > -1) ||
-                contentPane.getKeyCodes().contains(KeyEvent.VK_ENTER) ||
-                contentPane.getKeyCodes().contains(KeyEvent.VK_SPACE);
+    private boolean mouseClick() {
+        return (contentPane.getMouseClickX() > -1 && contentPane.getMouseClickY() > -1);
     }
 
 
