@@ -4,38 +4,26 @@ import com.gurpy.games.pojos.entities.BBoxPlayer;
 import com.gurpy.games.pojos.entities.Laser;
 import com.gurpy.games.pojos.entities.UIEntity;
 
-import java.awt.geom.Line2D;
-import java.awt.geom.Rectangle2D;
 
-public class CollisionAction extends UIAction{
+public class CollisionAction extends UIAction {
 
-    private UIEntity other;
-
-    public CollisionAction(UIEntity owner, UIEntity other) {
+    public CollisionAction(UIEntity owner) {
         super(owner);
-        this.other = other;
     }
 
     @Override
     public boolean perform() {
-        if (getOwner() instanceof BBoxPlayer && other instanceof Laser) {
+        if (getOwner() instanceof BBoxPlayer) {
             BBoxPlayer player = (BBoxPlayer)getOwner();
-            Laser laser = (Laser)other;
-            for (Line2D line2D : laser.getLines()) {
-                if (player.getBBox().intersectsLine(line2D)) {
-                    player.addCollision(laser);
+            for (UIEntity collision : player.getCollisions()) {
+                if (collision instanceof Laser && !((Laser)collision).getOwner().equals(player)) {
+                    player.setDestroy(true);
                 }
             }
+            player.getCollisions().clear();
+            return true;
         }
         return false;
-    }
-
-    public UIEntity getOther() {
-        return other;
-    }
-
-    public void setOther(UIEntity other) {
-        this.other = other;
     }
 
 }

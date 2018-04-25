@@ -3,14 +3,13 @@ package com.gurpy.games.core;
 import com.gurpy.games.gui.GurpusUI;
 import com.gurpy.games.pojos.action.*;
 import com.gurpy.games.pojos.component.ControlComponent;
+import com.gurpy.games.pojos.component.InputComponent;
 import com.gurpy.games.pojos.component.PhysicsComponent;
 import com.gurpy.games.pojos.control.Camera;
-import com.gurpy.games.pojos.control.Direction;
 import com.gurpy.games.pojos.entities.*;
 import com.gurpy.games.pojos.entities.Menu;
 import com.gurpy.games.pojos.entities.MenuItem;
 import com.gurpy.games.utils.Logger;
-import com.gurpy.games.utils.UtilFunctions;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -25,11 +24,13 @@ public class GurpusCore implements Runnable{
     private boolean isMenu = true;
     private PhysicsComponent physicsComponent;
     private ControlComponent controlComponent;
+    private InputComponent inputComponent;
 
     GurpusCore(GurpusUI contentPane) {
         this.contentPane = contentPane;
         this.physicsComponent = new PhysicsComponent();
         this.controlComponent = new ControlComponent();
+        this.inputComponent = new InputComponent();
     }
 
     public void run() {
@@ -65,22 +66,23 @@ public class GurpusCore implements Runnable{
             }
             //Check collisions with other elements.
             for (UIEntity other : contentPane.getGuiElements()) {
-                controlComponent.performAction(new CollisionAction(e, other));
+                controlComponent.performAction(new CollisionCheckAction(e, other));
             }
             //Check user input and update physics.
             if (e instanceof BBoxPlayer) {
                 BBoxPlayer player = (BBoxPlayer) e;
                 if (!isMenu) {
                     if (player.isControllable()) {
-                        checkPlayerInput(player);
+                        inputComponent.performAction(new PlayerMotionInputAction(player, contentPane));
+                        inputComponent.performAction(new PlayerShootingInputAction(player, contentPane));
                     } else {
                         //Player is AI controlled.
                     }
+                    controlComponent.performAction(new CollisionAction(player));
                     player.setDisplay(true);
                 } else {
                     player.setDisplay(false);
                 }
-                checkPlayerCollisions(player);
             }
             if (e instanceof Laser) {
                 Laser laser = (Laser) e;
@@ -112,8 +114,8 @@ public class GurpusCore implements Runnable{
                         } else {
                             item.setSelected(false);
                         }
-                        if (item.isSelected() && mouseClick()) {
-                            checkMenuItem(menu, item);
+                        if (item.isSelected() && contentPane.mouseClick()) {
+                            isMenu = controlComponent.performAction(new MenuAction(menu, item, contentPane));
                         }
                     }
                 } else {
@@ -154,175 +156,6 @@ public class GurpusCore implements Runnable{
             System.exit(0);
         }
     }
-
-    private void checkPlayerCollisions(BBoxPlayer player) {
-        for (UIEntity collision : player.getCollisions()) {
-            if (collision instanceof Laser && !((Laser)collision).getOwner().equals(player)) {
-                player.setDestroy(true);
-            }
-        }
-        player.getCollisions().clear();
-    }
-
-    private void checkMenuItem(Menu menu, MenuItem item) {
-        String itemText = item.getItemText();
-        switch (itemText) {
-            case "Play Game":
-                Logger.info("Starting Game.");
-                isMenu = false;
-                menu.setDisplay(false);
-                contentPane.setBackground(Color.WHITE);
-                break;
-            case "Options":
-                Logger.info("In Options.");
-                menu.setDisplay(false);
-                break;
-            case "Controls":
-                Logger.info("In Controls.");
-                menu.setDisplay(false);
-                break;
-            case "Exit Game":
-                Logger.info("Exiting Game.");
-                System.exit(1);
-                break;
-        }
-    }
-
-    private void checkPlayerInput(BBoxPlayer player) {
-
-        for (Integer i : contentPane.getKeyCodes()) {
-            Logger.info("Key: " + i);
-        }
-        //Movement
-        if (contentPane.getKeyCodes().contains(KeyEvent.VK_W) &&
-                        contentPane.getKeyCodes().contains(KeyEvent.VK_D)) {
-
-            physicsComponent.performAction(new MoveFocusedAction(player, contentPane.getCamera(),
-                    contentPane.getGuiElements(), player.getHspeed() / 2, -(player.getVspeed() / 2)));
-            player.setDirection(Direction.UP_RIGHT);
-
-        }
-        else if (contentPane.getKeyCodes().contains(KeyEvent.VK_W) &&
-                        contentPane.getKeyCodes().contains(KeyEvent.VK_A)) {
-
-            physicsComponent.performAction(new MoveFocusedAction(player, contentPane.getCamera(),
-                    contentPane.getGuiElements(), -(player.getHspeed() / 2), -(player.getVspeed() / 2)));
-            player.setDirection(Direction.UP_LEFT);
-
-        }
-        else if (contentPane.getKeyCodes().contains(KeyEvent.VK_S) &&
-                        contentPane.getKeyCodes().contains(KeyEvent.VK_D)) {
-
-            physicsComponent.performAction(new MoveFocusedAction(player, contentPane.getCamera(),
-                    contentPane.getGuiElements(), player.getHspeed() / 2, player.getVspeed() / 2));
-            player.setDirection(Direction.DOWN_RIGHT);
-
-        }
-        else if (contentPane.getKeyCodes().contains(KeyEvent.VK_S) &&
-                        contentPane.getKeyCodes().contains(KeyEvent.VK_A)) {
-
-            physicsComponent.performAction(new MoveFocusedAction(player, contentPane.getCamera(),
-                    contentPane.getGuiElements(), -(player.getHspeed() / 2), player.getVspeed() / 2));
-            player.setDirection(Direction.DOWN_LEFT);
-
-        }
-        else if (contentPane.getKeyCodes().contains(KeyEvent.VK_W)) {
-
-            physicsComponent.performAction(new MoveFocusedAction(player, contentPane.getCamera(),
-                    contentPane.getGuiElements(), 0, -(player.getVspeed())));
-            player.setDirection(Direction.UP);
-
-        }
-        else if (contentPane.getKeyCodes().contains(KeyEvent.VK_D)) {
-
-            physicsComponent.performAction(new MoveFocusedAction(player, contentPane.getCamera(),
-                    contentPane.getGuiElements(), player.getHspeed(), 0));
-            player.setDirection(Direction.RIGHT);
-
-        }
-        else if (contentPane.getKeyCodes().contains(KeyEvent.VK_S)) {
-
-            physicsComponent.performAction(new MoveFocusedAction(player, contentPane.getCamera(),
-                    contentPane.getGuiElements(), 0, player.getVspeed()));
-            player.setDirection(Direction.DOWN);
-
-        }
-        else if (contentPane.getKeyCodes().contains(KeyEvent.VK_A)) {
-
-            physicsComponent.performAction(new MoveFocusedAction(player, contentPane.getCamera(),
-                    contentPane.getGuiElements(), -(player.getHspeed()), 0));
-            player.setDirection(Direction.LEFT);
-
-        }
-
-        //Shooting
-        double shootDir = -1;
-        if (!mouseClick()) {
-            if (contentPane.getKeyCodes().contains(KeyEvent.VK_UP) &&
-                    contentPane.getKeyCodes().contains(KeyEvent.VK_RIGHT)) {
-
-                shootDir = Direction.UP_RIGHT;
-
-            }
-            else if (contentPane.getKeyCodes().contains(KeyEvent.VK_UP) &&
-                    contentPane.getKeyCodes().contains(KeyEvent.VK_LEFT)) {
-
-                shootDir = Direction.UP_LEFT;
-
-            }
-            else if (contentPane.getKeyCodes().contains(KeyEvent.VK_DOWN) &&
-                    contentPane.getKeyCodes().contains(KeyEvent.VK_RIGHT)) {
-
-                shootDir = Direction.DOWN_RIGHT;
-
-            }
-            else if (contentPane.getKeyCodes().contains(KeyEvent.VK_DOWN) &&
-                    contentPane.getKeyCodes().contains(KeyEvent.VK_LEFT)) {
-
-                shootDir = Direction.DOWN_LEFT;
-
-            }
-            else if (contentPane.getKeyCodes().contains(KeyEvent.VK_UP)) {
-
-                shootDir = Direction.UP;
-
-            }
-            else if (contentPane.getKeyCodes().contains(KeyEvent.VK_RIGHT)) {
-
-                shootDir = Direction.RIGHT;
-
-            }
-            else if (contentPane.getKeyCodes().contains(KeyEvent.VK_DOWN)) {
-
-                shootDir = Direction.DOWN;
-
-            }
-            else if (contentPane.getKeyCodes().contains(KeyEvent.VK_LEFT)) {
-
-                shootDir = Direction.LEFT;
-
-            }
-        } else {
-            shootDir = UtilFunctions.getAngle(
-                    new Point2D.Double(contentPane.getMouseX(), contentPane.getMouseY()),
-                    new Point2D.Double(player.getX() + player.getWidth() / 2, player.getY() + player.getHeight() / 2));
-
-        }
-
-        if (player.getStepsSinceShot() < (STEPS_PER_SEC / player.getFireRate())) {
-            player.setStepsSinceShot(player.getStepsSinceShot() + 1);
-        }
-        if (shootDir > -1 && player.getStepsSinceShot() > (STEPS_PER_SEC / player.getFireRate()) - 1) {
-            controlComponent.performAction(new ShootAction(player, contentPane, shootDir));
-            player.setStepsSinceShot(0);
-        }
-    }
-
-    private boolean mouseClick() {
-        return (contentPane.getMouseClickX() > -1 && contentPane.getMouseClickY() > -1);
-    }
-
-
 
 }
 

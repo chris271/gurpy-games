@@ -1,5 +1,8 @@
 package com.gurpy.games.pojos.entities;
 
+import com.gurpy.games.utils.Logger;
+
+import java.awt.*;
 import java.awt.geom.Point2D;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -50,4 +53,5 @@ public final class Menu extends UIElement{
         title.setY(title.getY() + (position.getY() - getPosition().getY()));
         super.setPosition(position);
     }
+
 }

@@ -258,4 +258,8 @@ public class GurpusUI extends JPanel {
         }
     }
 
+    public boolean mouseClick() {
+        return (getMouseClickX() > -1 && getMouseClickY() > -1);
+    }
+
 }
