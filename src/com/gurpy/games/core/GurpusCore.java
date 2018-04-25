@@ -19,7 +19,7 @@ import java.awt.geom.Rectangle2D;
 
 public class GurpusCore implements Runnable{
 
-    public static final double STEPS_PER_SEC = 100;
+    public static final double STEPS_PER_SEC = 200;
     private final GurpusUI contentPane;
     private final static String OS = System.getProperty("os.name").toLowerCase();
     private boolean isMenu = true;
@@ -256,7 +256,7 @@ public class GurpusCore implements Runnable{
         }
 
         //Shooting
-        int shootDir = -1;
+        double shootDir = -1;
         if (!mouseClick()) {
             if (contentPane.getKeyCodes().contains(KeyEvent.VK_UP) &&
                     contentPane.getKeyCodes().contains(KeyEvent.VK_RIGHT)) {
@@ -303,33 +303,11 @@ public class GurpusCore implements Runnable{
 
             }
         } else {
-            float angle = UtilFunctions.getAngle(
+            shootDir = UtilFunctions.getAngle(
                     new Point2D.Double(contentPane.getMouseX(), contentPane.getMouseY()),
                     new Point2D.Double(player.getX() + player.getWidth() / 2, player.getY() + player.getHeight() / 2));
-            if (angle < 22.5) {
-                shootDir = Direction.LEFT;
-            } else if (angle < 67.5) {
-                shootDir = Direction.UP_LEFT;
-            } else if (angle < 112.5) {
-                shootDir = Direction.UP;
-            } else if (angle < 157.5) {
-                shootDir = Direction.UP_RIGHT;
-            } else if (angle < 202.5) {
-                shootDir = Direction.RIGHT;
-            } else if (angle < 247.5) {
-                shootDir = Direction.DOWN_RIGHT;
-            } else if (angle < 292.5) {
-                shootDir = Direction.DOWN;
-            } else if (angle < 337.5) {
-                shootDir = Direction.DOWN_LEFT;
-            } else{
-                shootDir = Direction.LEFT;
-            }
+
         }
-        Logger.info("Mouse Click X: " + contentPane.getMouseClickX());
-        Logger.info("Mouse Click Y: " + contentPane.getMouseClickY());
-        Logger.info("Mouse X: " + contentPane.getMouseX());
-        Logger.info("Mouse Y: " + contentPane.getMouseY());
 
         if (player.getStepsSinceShot() < (STEPS_PER_SEC / player.getFireRate())) {
             player.setStepsSinceShot(player.getStepsSinceShot() + 1);

@@ -12,10 +12,10 @@ public class Laser extends LineElement {
     private UIEntity owner;
 
     public Laser(Point2D positionA, Point2D positionB, Color borderColor, Color bgColor,
-                 double borderThickness, double speed, int direction, UIEntity owner) {
-        super(new Line2D.Double(positionA, positionB), borderColor, bgColor, borderThickness, EntityTypes.LASER, direction);
-        this.hspeed = speed;
-        this.vspeed = speed;
+                 double laserThickness, double speed, double direction, UIEntity owner) {
+        super(new Line2D.Double(positionA, positionB), borderColor, bgColor, laserThickness, EntityTypes.LASER, direction);
+        this.hspeed = Math.cos(direction) * speed;
+        this.vspeed = Math.sin(direction) * speed;
         this.owner = owner;
         this.stepsAlive = 0;
     }

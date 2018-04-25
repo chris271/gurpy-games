@@ -19,7 +19,7 @@ public class BBoxPlayer extends BBoxElement {
     private double shotSpeed;
     private double bulletWidth;
     private double bulletHeight;
-    private int direction;
+    private double direction;
     private int stepsSinceShot;
     private int numBullets;
     private Color laserBorder;
@@ -122,11 +122,11 @@ public class BBoxPlayer extends BBoxElement {
         this.vspeed = vspeed;
     }
 
-    public int getDirection() {
+    public double getDirection() {
         return direction;
     }
 
-    public void setDirection(int direction) {
+    public void setDirection(double direction) {
         this.direction = direction;
     }
 
