@@ -7,7 +7,7 @@ public abstract class UIAction implements Action {
 
     private Entity owner;
 
-    UIAction(Entity owner) {
+    public UIAction(Entity owner) {
         this.owner = owner;
     }
 

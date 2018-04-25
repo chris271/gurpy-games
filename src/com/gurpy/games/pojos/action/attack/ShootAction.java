@@ -1,12 +1,10 @@
-package com.gurpy.games.pojos.action;
+package com.gurpy.games.pojos.action.attack;
 
 import com.gurpy.games.gui.GurpusUI;
-import com.gurpy.games.pojos.control.Direction;
+import com.gurpy.games.pojos.action.control.SpawnAction;
 import com.gurpy.games.pojos.entities.Laser;
 import com.gurpy.games.pojos.entities.BBoxPlayer;
 import com.gurpy.games.pojos.entities.UIElement;
-import com.gurpy.games.pojos.entities.UIEntity;
-import com.gurpy.games.utils.Logger;
 
 import java.awt.geom.Point2D;
 

@@ -1,5 +1,6 @@
-package com.gurpy.games.pojos.action;
+package com.gurpy.games.pojos.action.collision;
 
+import com.gurpy.games.pojos.action.UIAction;
 import com.gurpy.games.pojos.entities.BBoxElement;
 import com.gurpy.games.pojos.entities.BBoxPlayer;
 import com.gurpy.games.pojos.entities.Laser;
@@ -8,7 +9,7 @@ import com.gurpy.games.pojos.entities.UIEntity;
 import java.awt.geom.Line2D;
 import java.awt.geom.Rectangle2D;
 
-public class CollisionCheckAction extends UIAction{
+public class CollisionCheckAction extends UIAction {
 
     private UIEntity other;
 

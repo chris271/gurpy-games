@@ -1,6 +1,6 @@
 package com.gurpy.games.gui;
 
-import com.gurpy.games.pojos.action.DrawAction;
+import com.gurpy.games.pojos.action.gui.DrawAction;
 import com.gurpy.games.pojos.component.RenderingComponent;
 import com.gurpy.games.pojos.control.Camera;
 import com.gurpy.games.pojos.control.UIMouseListener;

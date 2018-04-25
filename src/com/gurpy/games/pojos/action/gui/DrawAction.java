@@ -1,5 +1,6 @@
-package com.gurpy.games.pojos.action;
+package com.gurpy.games.pojos.action.gui;
 
+import com.gurpy.games.pojos.action.UIAction;
 import com.gurpy.games.pojos.entities.*;
 import com.gurpy.games.pojos.entities.Menu;
 import com.gurpy.games.pojos.entities.MenuItem;

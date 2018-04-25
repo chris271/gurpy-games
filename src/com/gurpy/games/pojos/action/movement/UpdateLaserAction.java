@@ -1,7 +1,9 @@
-package com.gurpy.games.pojos.action;
+package com.gurpy.games.pojos.action.movement;
 
 import com.gurpy.games.core.GurpusCore;
 import com.gurpy.games.gui.GurpusUI;
+import com.gurpy.games.pojos.action.UIAction;
+import com.gurpy.games.pojos.action.control.DestroyAction;
 import com.gurpy.games.pojos.entities.BBoxPlayer;
 import com.gurpy.games.pojos.entities.Laser;
 

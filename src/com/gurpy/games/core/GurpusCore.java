@@ -1,7 +1,14 @@
 package com.gurpy.games.core;
 
 import com.gurpy.games.gui.GurpusUI;
-import com.gurpy.games.pojos.action.*;
+import com.gurpy.games.pojos.action.collision.CollisionAction;
+import com.gurpy.games.pojos.action.collision.CollisionCheckAction;
+import com.gurpy.games.pojos.action.control.DestroyAction;
+import com.gurpy.games.pojos.action.control.MenuAction;
+import com.gurpy.games.pojos.action.input.PlayerMotionInputAction;
+import com.gurpy.games.pojos.action.input.PlayerShootingInputAction;
+import com.gurpy.games.pojos.action.movement.TranslationAction;
+import com.gurpy.games.pojos.action.movement.UpdateLaserAction;
 import com.gurpy.games.pojos.component.ControlComponent;
 import com.gurpy.games.pojos.component.InputComponent;
 import com.gurpy.games.pojos.component.PhysicsComponent;
