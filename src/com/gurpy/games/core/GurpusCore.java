@@ -5,13 +5,17 @@ import com.gurpy.games.pojos.action.collision.CollisionAction;
 import com.gurpy.games.pojos.action.collision.CollisionCheckAction;
 import com.gurpy.games.pojos.action.control.DestroyAction;
 import com.gurpy.games.pojos.action.control.MenuAction;
+import com.gurpy.games.pojos.action.control.SpawnAction;
+import com.gurpy.games.pojos.action.control.StepSpawnerAction;
 import com.gurpy.games.pojos.action.input.PlayerMotionInputAction;
 import com.gurpy.games.pojos.action.input.PlayerShootingInputAction;
 import com.gurpy.games.pojos.action.movement.TranslationAction;
+import com.gurpy.games.pojos.action.movement.UpdateAIAction;
 import com.gurpy.games.pojos.action.movement.UpdateLaserAction;
 import com.gurpy.games.pojos.component.ControlComponent;
 import com.gurpy.games.pojos.component.InputComponent;
 import com.gurpy.games.pojos.component.PhysicsComponent;
+import com.gurpy.games.pojos.control.BBoxSpawner;
 import com.gurpy.games.pojos.control.Camera;
 import com.gurpy.games.pojos.entities.*;
 import com.gurpy.games.pojos.entities.Menu;
@@ -29,15 +33,18 @@ public class GurpusCore implements Runnable{
     private final GurpusUI contentPane;
     private final static String OS = System.getProperty("os.name").toLowerCase();
     private boolean isMenu = true;
+    private boolean gameOver = false;
     private PhysicsComponent physicsComponent;
     private ControlComponent controlComponent;
     private InputComponent inputComponent;
+    private UIElement mainPlayer;
 
     GurpusCore(GurpusUI contentPane) {
         this.contentPane = contentPane;
         this.physicsComponent = new PhysicsComponent();
         this.controlComponent = new ControlComponent();
         this.inputComponent = new InputComponent();
+        mainPlayer = new UIElement(new Point2D.Double(0, 0)) {};
     }
 
     public void run() {
@@ -68,25 +75,37 @@ public class GurpusCore implements Runnable{
         for (UIElement e : contentPane.getGuiElements()) {
             //Check if element is marked for destruction.
             if (e.isDestroy()) {
+                if (e.equals(mainPlayer)) {
+                    TextElement textElement = new TextElement(
+                            new Point2D.Double(contentPane.getWidth() / 2, contentPane.getHeight() / 2),
+                            "GAME OVER!!! CLICK OR PRESS ENTER TO RESTART...");
+                    textElement.addToX(-textElement.getText().length() * textElement.getBorderThickness() / 4);
+                    controlComponent.performAction(new SpawnAction(textElement, contentPane));
+                    gameOver = true;
+                }
                 controlComponent.performAction(new DestroyAction(e, contentPane));
                 continue;
             }
             //Check collisions with other elements.
             for (UIEntity other : contentPane.getGuiElements()) {
-                controlComponent.performAction(new CollisionCheckAction(e, other));
+                if (!other.equals(e))
+                    controlComponent.performAction(new CollisionCheckAction(e, other));
             }
             //Check user input and update physics.
             if (e instanceof BBoxPlayer) {
                 BBoxPlayer player = (BBoxPlayer) e;
+                if (player.isFocused())
+                    mainPlayer = player;
                 if (!isMenu) {
+                    player.setDisplay(true);
                     if (player.isControllable()) {
                         inputComponent.performAction(new PlayerMotionInputAction(player, contentPane));
                         inputComponent.performAction(new PlayerShootingInputAction(player, contentPane));
                     } else {
-                        //Player is AI controlled.
+                        physicsComponent.performAction(new UpdateAIAction(player, mainPlayer));
                     }
-                    controlComponent.performAction(new CollisionAction(player));
-                    player.setDisplay(true);
+                    if (player.getCollisions().size() > 0)
+                        controlComponent.performAction(new CollisionAction(player));
                 } else {
                     player.setDisplay(false);
                 }
@@ -123,11 +142,16 @@ public class GurpusCore implements Runnable{
                         }
                         if (item.isSelected() && contentPane.mouseClick()) {
                             isMenu = controlComponent.performAction(new MenuAction(menu, item, contentPane));
+                            if (!isMenu) {
+                                contentPane.resetGame();
+                                break;
+                            }
                         }
                     }
+                    if (!isMenu)
+                        break;
                 } else {
                     if (contentPane.getKeyCodes().contains(KeyEvent.VK_ESCAPE)) {
-                        contentPane.setBackground(Color.BLACK);
                         isMenu = true;
                         e.setDisplay(true);
                     }
@@ -135,6 +159,14 @@ public class GurpusCore implements Runnable{
             }
         }
 
+
+
+        if (gameOver && (contentPane.getKeyCodes().contains(KeyEvent.VK_ENTER) || contentPane.mouseClick())) {
+            gameOver = false;
+            contentPane.resetGame();
+        }
+
+        stepSpawner();
         detectWindowChanges();
 
     }
@@ -158,10 +190,48 @@ public class GurpusCore implements Runnable{
                     contentPane.MIN_Y, contentPane.MAX_Y - contentPane.MIN_Y));
         }
 
+        if (isMenu) {
+            contentPane.setBackground(Color.BLACK);
+        } else {
+            contentPane.setBackground(Color.WHITE);
+        }
+
         if (!contentPane.isShowing()) {
             Logger.error("Cannot find GUI!");
             System.exit(0);
         }
+    }
+
+    private void stepSpawner() {
+        BBoxSpawner mainSpawner = new BBoxSpawner(
+                new Rectangle2D.Double(0, 0, contentPane.getCurrentWidth(), contentPane.getCurrentHeight()),
+                new Rectangle2D.Double(contentPane.MIN_X, contentPane.MIN_Y,
+                        contentPane.MAX_X - contentPane.MIN_X, contentPane.MAX_Y - contentPane.MIN_Y));
+        mainSpawner.addSpawnList(new BBoxEnemy(
+                new Point2D.Double(0, 0),
+                new Dimension(100, 100),
+                Color.BLACK,
+                Color.YELLOW,
+                15.0,
+                2,
+                EnemyTypes.HOMING));
+        mainSpawner.addSpawnList(new BBoxEnemy(
+                new Point2D.Double(0, 0),
+                new Dimension(100, 100),
+                Color.BLACK,
+                Color.GREEN,
+                15.0,
+                2,
+                EnemyTypes.HOMING));
+        mainSpawner.addSpawnList(new BBoxEnemy(
+                new Point2D.Double(0, 0),
+                new Dimension(100, 100),
+                Color.BLACK,
+                Color.CYAN,
+                15.0,
+                2,
+                EnemyTypes.HOMING));
+        controlComponent.performAction(new StepSpawnerAction(mainSpawner, contentPane, .01));
     }
 
 }

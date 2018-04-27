@@ -19,6 +19,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class GurpusUI extends JPanel {
     //Allow for easy scaling of UIElements.
     private final int MAX_FRAME_RATE = 120;
+    private final int SCALING = 1;
     public final int MIN_X = -1000;
     public final int MIN_Y = -1000;
     public final int MAX_X = 1000;
@@ -31,6 +32,7 @@ public class GurpusUI extends JPanel {
     private volatile int currentHeight = 0;
     private volatile int fps = 0;
     private volatile Camera camera;
+    private volatile UIElement mainPlayer;
     private CopyOnWriteArrayList<UIElement> guiElements = new CopyOnWriteArrayList<>();
     private CopyOnWriteArrayList<Integer> keyCodes = new CopyOnWriteArrayList<>();
     private UIMouseListener uiMouseListener;
@@ -82,8 +84,19 @@ public class GurpusUI extends JPanel {
             }
         });
 
-        final int SCALING = 1;
+        camera = new Camera(0, getWidth(), 0, getHeight(), MIN_X, MAX_X - MIN_X, MIN_Y, MAX_Y - MIN_Y);
         renderingComponent = new RenderingComponent();
+        lastFrameTime = System.nanoTime();
+        addMenu(true);
+
+    }
+
+    public void resetGame() {
+
+        final double MAIN_PLAYER_START_WIDTH = 50;
+        final double MAIN_PLAYER_START_HEIGHT = 50;
+
+        guiElements.clear();
         TextElement fpsCounter = new TextElement(
                 new Point2D.Double(10, 20),
                 Color.BLACK,
@@ -93,6 +106,26 @@ public class GurpusUI extends JPanel {
         fpsCounter.setDisplay(true);
         addGuiElement(fpsCounter);
 
+        addMenu(false);
+        BBoxPlayer player = new BBoxPlayer(
+                new Point2D.Double(getWidth() / 2 - MAIN_PLAYER_START_WIDTH / 2, getHeight() / 2 - MAIN_PLAYER_START_HEIGHT / 2),
+                new Dimension((int)MAIN_PLAYER_START_WIDTH * SCALING, (int)MAIN_PLAYER_START_HEIGHT * SCALING),
+                Color.BLACK,
+                Color.RED,
+                10.0,
+                5);
+        player.setLaserColor(Color.CYAN);
+        player.setLaserColor(Color.BLUE);
+        player.setNumBullets(3);
+        player.setControllable(true);
+        player.setFocused(true);
+        player.setDoubleShot(true);
+        addGuiElement(player);
+        camera = new Camera(0, getWidth(), 0, getHeight(), MIN_X, MAX_X - MIN_X, MIN_Y, MAX_Y - MIN_Y);
+
+    }
+
+    private void addMenu(boolean display) {
         CopyOnWriteArrayList<MenuItem> menuItems = new CopyOnWriteArrayList<>();
         menuItems.add(new MenuItem(
                 new Point2D.Double(getPreferredSize().getWidth() / 2 - 200 * SCALING, getPreferredSize().getHeight() / 4),
@@ -128,33 +161,7 @@ public class GurpusUI extends JPanel {
                 Color.BLACK,
                 "Gurpus Maximus",
                 24);
-        addGuiElement(new Menu(menuTitle, menuItems, true));
-        BBoxPlayer player = new BBoxPlayer(
-                new Point2D.Double(getPreferredSize().getWidth() / 2 - 50, getPreferredSize().getHeight() / 2 - 50),
-                new Dimension(100 * SCALING, 100 * SCALING),
-                Color.BLACK,
-                Color.RED,
-                15.0,
-                5);
-        player.setLaserColor(Color.CYAN);
-        player.setLaserColor(Color.BLUE);
-        player.setNumBullets(3);
-        player.setControllable(true);
-        player.setFocused(true);
-        player.setDoubleShot(true);
-        addGuiElement(player);
-        addGuiElement(new BBoxEnemy(
-                new Point2D.Double(0, 0),
-                new Dimension(100 * SCALING, 100 * SCALING),
-                Color.BLACK,
-                Color.YELLOW,
-                15.0,
-                5,
-                EnemyTypes.DUMMY));
-
-        camera = new Camera(0, currentWidth, 0, currentHeight, MIN_X, MAX_X - MIN_X, MIN_Y, MAX_Y - MIN_Y);
-        lastFrameTime = System.nanoTime();
-
+        addGuiElement(new Menu(menuTitle, menuItems, display));
     }
 
     @Override

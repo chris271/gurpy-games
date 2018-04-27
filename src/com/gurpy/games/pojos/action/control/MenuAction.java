@@ -26,7 +26,7 @@ public class MenuAction extends UIAction {
         switch (itemText) {
             case "Play Game":
                 contentPane.setBackground(Color.WHITE);
-                menu.setDisplay(false);
+                contentPane.resetGame();
                 return false;
             case "Options":
                 menu.setDisplay(false);

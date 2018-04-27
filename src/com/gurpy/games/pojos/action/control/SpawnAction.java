@@ -17,12 +17,7 @@ public class SpawnAction extends UIAction {
 
     @Override
     public boolean perform() {
-        if (getOwner() instanceof BBoxElement || getOwner() instanceof LineElement) {
-            contentPane.getGuiElements().add((UIElement) getOwner());
-            return true;
-        } else {
-            return false;
-        }
+        return contentPane.getGuiElements().add((UIElement) getOwner());
     }
 
     public GurpusUI getContentPane() {

@@ -2,6 +2,7 @@ package com.gurpy.games.pojos.action.movement;
 
 import com.gurpy.games.pojos.action.UIAction;
 import com.gurpy.games.pojos.entities.*;
+import com.gurpy.games.utils.Logger;
 
 import java.awt.geom.Point2D;
 
@@ -20,9 +21,13 @@ public class TranslationAction extends UIAction {
             BBoxElement boxElem = (BBoxElement)getOwner();
             boxElem.setPosition(newPos);
             return true;
-        } else if (getOwner() instanceof Laser) {
+        } else if (getOwner() instanceof LineElement) {
             Laser laser = (Laser)getOwner();
             laser.setPosition(newPos);
+            return true;
+        } else if (getOwner() instanceof TextElement) {
+            TextElement textElement = (TextElement)getOwner();
+            textElement.setPosition(newPos);
             return true;
         } else if (getOwner() instanceof Menu) {
             Menu menu = (Menu)getOwner();

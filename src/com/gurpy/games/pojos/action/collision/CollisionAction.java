@@ -1,9 +1,7 @@
 package com.gurpy.games.pojos.action.collision;
 
 import com.gurpy.games.pojos.action.UIAction;
-import com.gurpy.games.pojos.entities.BBoxPlayer;
-import com.gurpy.games.pojos.entities.Laser;
-import com.gurpy.games.pojos.entities.UIEntity;
+import com.gurpy.games.pojos.entities.*;
 
 
 public class CollisionAction extends UIAction {
@@ -17,8 +15,12 @@ public class CollisionAction extends UIAction {
         if (getOwner() instanceof BBoxPlayer) {
             BBoxPlayer player = (BBoxPlayer)getOwner();
             for (UIEntity collision : player.getCollisions()) {
-                if (collision instanceof Laser && !((Laser)collision).getOwner().equals(player)) {
-                    player.setDestroy(true);
+                if (collision instanceof Laser) {
+                    if (!((Laser)collision).getOwner().equals(player))
+                        player.setDestroy(true);
+                } else if (collision instanceof BBoxEnemy) {
+                    if (!(player instanceof BBoxEnemy))
+                        player.setDestroy(true);
                 }
             }
             player.getCollisions().clear();

@@ -2,9 +2,7 @@ package com.gurpy.games.pojos.action.movement;
 
 import com.gurpy.games.pojos.action.UIAction;
 import com.gurpy.games.pojos.control.Camera;
-import com.gurpy.games.pojos.entities.BBoxPlayer;
-import com.gurpy.games.pojos.entities.Entity;
-import com.gurpy.games.pojos.entities.UIElement;
+import com.gurpy.games.pojos.entities.*;
 
 import java.awt.geom.Point2D;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -49,6 +47,8 @@ public class MoveFocusedAction extends UIAction {
                 if (player.getRelativeX() > camera.getOuterX1() + camera.getinnerW() / 2 &&
                         player.getRelativeX() < camera.getOuterX1() + camera.getouterW() - camera.getinnerW() / 2) {
                     for (UIElement uiElement : guiElements) {
+                        if ((uiElement instanceof TextElement && ((TextElement) uiElement).getText().contains("FPS")) || uiElement instanceof Menu)
+                            continue;
                         if (!getOwner().equals(uiElement)) {
                             new TranslationAction(uiElement,
                                     new Point2D.Double(uiElement.getX() - xAmount, uiElement.getY())).perform();
@@ -73,6 +73,8 @@ public class MoveFocusedAction extends UIAction {
                 if (player.getRelativeY() > camera.getOuterY1() + camera.getinnerH() / 2 &&
                         player.getRelativeY() < camera.getOuterY1() + camera.getouterH() - camera.getinnerH() / 2) {
                     for (UIElement uiElement : guiElements) {
+                        if ((uiElement instanceof TextElement && ((TextElement) uiElement).getText().contains("FPS")) || uiElement instanceof Menu)
+                            continue;
                         if (!getOwner().equals(uiElement)) {
                             new TranslationAction(uiElement,
                                     new Point2D.Double(uiElement.getX(), uiElement.getY() - yAmount)).perform();

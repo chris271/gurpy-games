@@ -73,7 +73,7 @@ public abstract class UIElement implements UIEntity{
      * Constructor used for generic black UI element.
      * @param position
      */
-    UIElement(Point2D position){
+    public UIElement(Point2D position){
         this.xLoc = position.getX();
         this.yLoc = position.getY();
         this.borderColor = Color.BLACK;
