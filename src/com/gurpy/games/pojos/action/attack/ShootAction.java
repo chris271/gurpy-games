@@ -37,9 +37,9 @@ public class ShootAction extends SpawnAction {
 
         double laserDir;
         if (i % 2 == 1)
-            laserDir = (shootDir + Math.toRadians((i + 1) / 2 * 45)) % Math.toRadians(360);
+            laserDir = (shootDir + Math.toRadians((i + 1) / 2 * 20)) % Math.toRadians(360);
         else
-            laserDir = (shootDir - Math.toRadians((i + 1) / 2 * 45)) % Math.toRadians(360);
+            laserDir = (shootDir - Math.toRadians((i + 1) / 2 * 20)) % Math.toRadians(360);
 
         double bulletXOffset = Math.cos(laserDir) * player.getBulletHeight();
         double bulletYOffset = Math.sin(laserDir) * player.getBulletHeight();

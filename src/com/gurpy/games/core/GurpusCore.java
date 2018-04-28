@@ -78,82 +78,93 @@ public class GurpusCore implements Runnable{
                 if (e.equals(mainPlayer)) {
                     TextElement textElement = new TextElement(
                             new Point2D.Double(contentPane.getWidth() / 2, contentPane.getHeight() / 2),
-                            "GAME OVER!!! CLICK OR PRESS ENTER TO RESTART...");
+                            "OH...YOU DIED... CLICK OR PRESS ENTER TO RESTART...");
                     textElement.addToX(-textElement.getText().length() * textElement.getBorderThickness() / 4);
                     controlComponent.performAction(new SpawnAction(textElement, contentPane));
                     gameOver = true;
                 }
                 controlComponent.performAction(new DestroyAction(e, contentPane));
-                continue;
-            }
-            //Check collisions with other elements.
-            for (UIEntity other : contentPane.getGuiElements()) {
-                if (!other.equals(e))
-                    controlComponent.performAction(new CollisionCheckAction(e, other));
-            }
-            //Check user input and update physics.
-            if (e instanceof BBoxPlayer) {
-                BBoxPlayer player = (BBoxPlayer) e;
-                if (player.isFocused())
-                    mainPlayer = player;
-                if (!isMenu) {
-                    player.setDisplay(true);
-                    if (player.isControllable()) {
-                        inputComponent.performAction(new PlayerMotionInputAction(player, contentPane));
-                        inputComponent.performAction(new PlayerShootingInputAction(player, contentPane));
-                    } else {
-                        physicsComponent.performAction(new UpdateAIAction(player, mainPlayer));
-                    }
-                    if (player.getCollisions().size() > 0)
-                        controlComponent.performAction(new CollisionAction(player));
-                } else {
-                    player.setDisplay(false);
+            } else {
+                //Check collisions with other elements.
+                for (UIElement other : contentPane.getGuiElements()) {
+                    if (!other.equals(e) && !other.isDestroy())
+                        controlComponent.performAction(new CollisionCheckAction(e, other));
                 }
-            }
-            if (e instanceof Laser) {
-                Laser laser = (Laser) e;
-                if (!isMenu) {
-                    laser.setDisplay(true);
-                    physicsComponent.performAction(new UpdateLaserAction(laser, contentPane));
-                } else {
-                    laser.setDisplay(false);
-                }
-
-            }
-            if (e instanceof TextElement) {
-                TextElement textElement = (TextElement)e;
-                if (textElement.getText().contains("FPS")) {
-                    textElement.setText("FPS: " + contentPane.getFps());
-                } else if (!isMenu) {
-                    e.setDisplay(true);
-                } else {
-                    e.setDisplay(false);
-                }
-            }
-            if (e instanceof Menu) {
-                Menu menu = (Menu)e;
-                if (menu.isDisplay()) {
-                    for (MenuItem item : menu.getMenuItems()) {
-                        if (new Rectangle2D.Double(item.getX(), item.getY(), item.getWidth(), item.getHeight())
-                                .contains(contentPane.getMouseX(), contentPane.getMouseY())) {
-                            item.setSelected(true);
-                        } else {
-                            item.setSelected(false);
+                //Check user input and update physics.
+                if (e instanceof BBoxPlayer) {
+                    BBoxPlayer player = (BBoxPlayer) e;
+                    if (player.isFocused()) {
+                        mainPlayer = player;
+                        if (player.getHealth() <= 0) {
+                            player.setDestroy(true);
                         }
-                        if (item.isSelected() && contentPane.mouseClick()) {
-                            isMenu = controlComponent.performAction(new MenuAction(menu, item, contentPane));
-                            if (!isMenu) {
-                                contentPane.resetGame();
-                                break;
+                    }
+                    if (!isMenu) {
+                        player.setDisplay(true);
+                        if (player.isControllable()) {
+                            inputComponent.performAction(new PlayerMotionInputAction(player, contentPane));
+                            inputComponent.performAction(new PlayerShootingInputAction(player, contentPane));
+                        } else {
+                            physicsComponent.performAction(new UpdateAIAction(player, mainPlayer));
+                        }
+                        if (player.getCollisions().size() > 0)
+                            controlComponent.performAction(new CollisionAction(player));
+                    } else {
+                        player.setDisplay(false);
+                    }
+                }
+                if (e instanceof Laser) {
+                    Laser laser = (Laser) e;
+                    if (!isMenu) {
+                        laser.setDisplay(true);
+                        physicsComponent.performAction(new UpdateLaserAction(laser, contentPane));
+                    } else {
+                        laser.setDisplay(false);
+                    }
+
+                }
+                if (e instanceof TextElement) {
+                    TextElement textElement = (TextElement) e;
+                    if (textElement.getText().contains("FPS")) {
+                        textElement.setText("FPS: " + contentPane.getFps());
+                    } else if (!isMenu) {
+                        e.setDisplay(true);
+                        if (textElement.getText().contains("Kill Count")) {
+                            if (mainPlayer instanceof BBoxPlayer)
+                                textElement.setText("Kill Count: " + ((BBoxPlayer) mainPlayer).getKillCount());
+                        } else if (textElement.getText().contains("Score")) {
+                            if (mainPlayer instanceof BBoxPlayer)
+                                textElement.setText("Score: " + ((BBoxPlayer) mainPlayer).getScore());
+                        }
+                    } else {
+                        e.setDisplay(false);
+                    }
+                }
+                if (e instanceof Menu) {
+                    Menu menu = (Menu) e;
+                    if (menu.isDisplay()) {
+                        for (MenuItem item : menu.getMenuItems()) {
+                            if (new Rectangle2D.Double(item.getX(), item.getY(), item.getWidth(), item.getHeight())
+                                    .contains(contentPane.getMouseX(), contentPane.getMouseY())) {
+                                item.setSelected(true);
+                            } else {
+                                item.setSelected(false);
+                            }
+                            if (item.isSelected() && contentPane.mouseClick()) {
+                                isMenu = controlComponent.performAction(new MenuAction(menu, item, contentPane));
+                                if (!isMenu) {
+                                    contentPane.resetGame();
+                                    break;
+                                }
                             }
                         }
-                    }
-                    if (!isMenu)
-                        break;
-                } else {
-                    if (contentPane.getKeyCodes().contains(KeyEvent.VK_ESCAPE)) {
-                        isMenu = true;
-                        e.setDisplay(true);
+                        if (!isMenu)
+                            break;
+                    } else {
+                        if (contentPane.getKeyCodes().contains(KeyEvent.VK_ESCAPE)) {
+                            isMenu = true;
+                            e.setDisplay(true);
+                        }
                     }
                 }
             }
@@ -175,7 +186,7 @@ public class GurpusCore implements Runnable{
         //On window resize update element draw positions...
         if (contentPane.getCurrentWidth() != contentPane.getWidth() || contentPane.getCurrentHeight() != contentPane.getHeight()) {
             for (UIElement e : contentPane.getGuiElements()) {
-                if (!(e instanceof TextElement && ((TextElement) e).getText().contains("FPS"))) {
+                if (!(e instanceof TextElement && ((TextElement)e).isStaticText())) {
                     physicsComponent.performAction(new TranslationAction(e, new Point2D.Double(
                         e.getX() + (contentPane.getWidth() - contentPane.getCurrentWidth()) / 2.0,
                         e.getY() + (contentPane.getHeight() - contentPane.getCurrentHeight()) / 2.0)));
@@ -208,30 +219,62 @@ public class GurpusCore implements Runnable{
                 new Rectangle2D.Double(contentPane.MIN_X, contentPane.MIN_Y,
                         contentPane.MAX_X - contentPane.MIN_X, contentPane.MAX_Y - contentPane.MIN_Y));
         mainSpawner.addSpawnList(new BBoxEnemy(
-                new Point2D.Double(0, 0),
                 new Dimension(100, 100),
                 Color.BLACK,
                 Color.YELLOW,
                 15.0,
                 2,
+                200,
                 EnemyTypes.HOMING));
         mainSpawner.addSpawnList(new BBoxEnemy(
-                new Point2D.Double(0, 0),
-                new Dimension(100, 100),
+                new Dimension(25, 25),
                 Color.BLACK,
                 Color.GREEN,
-                15.0,
+                10.0,
                 2,
+                5,
                 EnemyTypes.HOMING));
         mainSpawner.addSpawnList(new BBoxEnemy(
-                new Point2D.Double(0, 0),
-                new Dimension(100, 100),
+                new Dimension(50, 250),
                 Color.BLACK,
                 Color.CYAN,
                 15.0,
                 2,
+                25,
                 EnemyTypes.HOMING));
-        controlComponent.performAction(new StepSpawnerAction(mainSpawner, contentPane, .01));
+        mainSpawner.addSpawnList(new BBoxEnemy(
+                new Dimension(50, 50),
+                Color.RED,
+                Color.BLUE,
+                15.0,
+                2,
+                75,
+                EnemyTypes.HOMING));
+        mainSpawner.addSpawnList(new BBoxEnemy(
+                new Dimension(400, 400),
+                Color.BLUE,
+                Color.ORANGE,
+                15.0,
+                2,
+                250,
+                EnemyTypes.HOMING));
+        mainSpawner.addSpawnList(new BBoxEnemy(
+                new Dimension(300, 300),
+                Color.MAGENTA,
+                Color.CYAN,
+                15.0,
+                2,
+                225,
+                EnemyTypes.HOMING));
+        mainSpawner.addSpawnList(new BBoxEnemy(
+                new Dimension(100, 200),
+                Color.MAGENTA,
+                Color.PINK,
+                15.0,
+                2,
+                215,
+                EnemyTypes.HOMING));
+        controlComponent.performAction(new StepSpawnerAction(mainSpawner, contentPane, .05));
     }
 
 }

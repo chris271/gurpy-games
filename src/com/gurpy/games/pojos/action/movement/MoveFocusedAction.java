@@ -47,7 +47,7 @@ public class MoveFocusedAction extends UIAction {
                 if (player.getRelativeX() > camera.getOuterX1() + camera.getinnerW() / 2 &&
                         player.getRelativeX() < camera.getOuterX1() + camera.getouterW() - camera.getinnerW() / 2) {
                     for (UIElement uiElement : guiElements) {
-                        if ((uiElement instanceof TextElement && ((TextElement) uiElement).getText().contains("FPS")) || uiElement instanceof Menu)
+                        if ((uiElement instanceof TextElement && ((TextElement) uiElement).isStaticText()) || uiElement instanceof Menu)
                             continue;
                         if (!getOwner().equals(uiElement)) {
                             new TranslationAction(uiElement,
@@ -73,7 +73,7 @@ public class MoveFocusedAction extends UIAction {
                 if (player.getRelativeY() > camera.getOuterY1() + camera.getinnerH() / 2 &&
                         player.getRelativeY() < camera.getOuterY1() + camera.getouterH() - camera.getinnerH() / 2) {
                     for (UIElement uiElement : guiElements) {
-                        if ((uiElement instanceof TextElement && ((TextElement) uiElement).getText().contains("FPS")) || uiElement instanceof Menu)
+                        if ((uiElement instanceof TextElement && ((TextElement) uiElement).isStaticText()) || uiElement instanceof Menu)
                             continue;
                         if (!getOwner().equals(uiElement)) {
                             new TranslationAction(uiElement,

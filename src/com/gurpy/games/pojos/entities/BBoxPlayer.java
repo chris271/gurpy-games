@@ -5,6 +5,7 @@ import com.gurpy.games.pojos.control.Direction;
 
 import java.awt.*;
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 
 public class BBoxPlayer extends BBoxElement {
@@ -20,10 +21,17 @@ public class BBoxPlayer extends BBoxElement {
     private double bulletWidth;
     private double bulletHeight;
     private double direction;
+    private double health;
+    private double maxHealth;
+    private double score;
     private int stepsSinceShot;
     private int numBullets;
+    private int killCount;
     private Color laserBorder;
     private Color laserColor;
+    private Color healthBarColor;
+    private Color healthBarBorder;
+    private Color healthBarFillColor;
     private double relativeX;
     private double relativeY;
 
@@ -52,6 +60,13 @@ public class BBoxPlayer extends BBoxElement {
         this.relativeX = position.getX();
         this.relativeY = position.getY();
         this.doubleShot = false;
+        this.health = 100;
+        this.maxHealth = 100;
+        this.healthBarBorder = Color.GREEN;
+        this.healthBarColor = Color.GREEN;
+        this.healthBarFillColor = Color.RED;
+        this.killCount = 0;
+        this.score = 0;
     }
 
     /**
@@ -78,6 +93,11 @@ public class BBoxPlayer extends BBoxElement {
         this.relativeX = position.getX();
         this.relativeY = position.getY();
         this.doubleShot = false;
+        this.healthBarBorder = Color.GREEN;
+        this.healthBarColor = Color.GREEN;
+        this.healthBarFillColor = Color.RED;
+        this.killCount = 0;
+        this.score = 0;
     }
 
     /**
@@ -104,6 +124,11 @@ public class BBoxPlayer extends BBoxElement {
         this.relativeX = position.getX();
         this.relativeY = position.getY();
         this.doubleShot = false;
+        this.healthBarBorder = Color.GREEN;
+        this.healthBarColor = Color.GREEN;
+        this.healthBarFillColor = Color.RED;
+        this.killCount = 0;
+        this.score = 0;
     }
 
     public double getHspeed() {
@@ -244,5 +269,69 @@ public class BBoxPlayer extends BBoxElement {
 
     public void setDoubleShot(boolean doubleShot) {
         this.doubleShot = doubleShot;
+    }
+
+    public Rectangle2D.Double getHealthBar() {
+        return new Rectangle2D.Double(this.getX() + this.getWidth() / 2 - 50, this.getY() + this.getHeight() + 10, 100, 20);
+    }
+
+    public Rectangle2D.Double getHealthBarFill() {
+        return new Rectangle2D.Double(this.getX() + this.getWidth() / 2 - 40, this.getY() + this.getHeight() + 14, 80, 12);
+    }
+
+    public double getHealth() {
+        return health;
+    }
+
+    public void setHealth(double health) {
+        this.health = health;
+    }
+
+    public double getMaxHealth() {
+        return maxHealth;
+    }
+
+    public void setMaxHealth(double maxHealth) {
+        this.maxHealth = maxHealth;
+    }
+
+    public Color getHealthBarColor() {
+        return healthBarColor;
+    }
+
+    public void setHealthBarColor(Color healthBarColor) {
+        this.healthBarColor = healthBarColor;
+    }
+
+    public Color getHealthBarBorder() {
+        return healthBarBorder;
+    }
+
+    public void setHealthBarBorder(Color healthBarBorder) {
+        this.healthBarBorder = healthBarBorder;
+    }
+
+    public Color getHealthBarFillColor() {
+        return healthBarFillColor;
+    }
+
+    public void setHealthBarFillColor(Color healthBarFillColor) {
+        this.healthBarFillColor = healthBarFillColor;
+    }
+
+    public double getScore() {
+        return score;
+    }
+
+    public void setScore(double score) {
+        this.score = score;
+    }
+
+    public int getKillCount() {
+        return killCount;
+    }
+
+    public void setKillCount(int killCount) {
+        this.killCount = killCount;
     }
 }

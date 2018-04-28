@@ -20,10 +20,10 @@ public class GurpusUI extends JPanel {
     //Allow for easy scaling of UIElements.
     private final int MAX_FRAME_RATE = 120;
     private final int SCALING = 1;
-    public final int MIN_X = -1000;
-    public final int MIN_Y = -1000;
-    public final int MAX_X = 1000;
-    public final int MAX_Y = 1000;
+    public final int MIN_X = -7680;
+    public final int MIN_Y = -4320;
+    public final int MAX_X = 7680;
+    public final int MAX_Y = 4320;
     private final long NANO_IN_SEC = 1000000000;
     private long start = 0;
     private long lastFrameTime = 0;
@@ -48,7 +48,8 @@ public class GurpusUI extends JPanel {
     public GurpusUI() {
         //Self explanatory
         this.setBackground(Color.BLACK);
-        this.setPreferredSize(new Dimension(600, 600));
+        this.setSize(new Dimension(1920, 1080));
+        this.setPreferredSize(new Dimension(1920, 1080));
         this.setDoubleBuffered(true);
         currentWidth = getPreferredSize().getSize().width;
         currentHeight = getPreferredSize().getSize().height;
@@ -93,18 +94,33 @@ public class GurpusUI extends JPanel {
 
     public void resetGame() {
 
-        final double MAIN_PLAYER_START_WIDTH = 50;
-        final double MAIN_PLAYER_START_HEIGHT = 50;
+        final double MAIN_PLAYER_START_WIDTH = 100;
+        final double MAIN_PLAYER_START_HEIGHT = 100;
 
         guiElements.clear();
         TextElement fpsCounter = new TextElement(
-                new Point2D.Double(10, 20),
+                new Point2D.Double(10, 25),
                 Color.BLACK,
                 Color.RED,
                 "FPS: 0",
-                10.0);
+                10.0,
+                true);
         fpsCounter.setDisplay(true);
         addGuiElement(fpsCounter);
+        addGuiElement(new TextElement(
+                new Point2D.Double(getWidth() * .9, 25),
+                Color.RED.darker(),
+                Color.WHITE,
+                "Kill Count: 0",
+                20.0,
+                true));
+        addGuiElement(new TextElement(
+                new Point2D.Double(getWidth() * .9, 50),
+                Color.MAGENTA.darker(),
+                Color.WHITE,
+                "Score: 0",
+                20.0,
+                true));
 
         addMenu(false);
         BBoxPlayer player = new BBoxPlayer(
@@ -114,12 +130,19 @@ public class GurpusUI extends JPanel {
                 Color.RED,
                 10.0,
                 5);
-        player.setLaserColor(Color.CYAN);
-        player.setLaserColor(Color.BLUE);
+        player.setLaserColor(Color.GREEN);
+        player.setLaserBorder(Color.YELLOW.darker().darker());
         player.setNumBullets(3);
+        player.setBulletHeight(50);
+        player.setBulletWidth(20);
+        player.setShotSpeed(50);
+        player.setFireRate(25);
+        player.setRange(2);
+        player.setDoubleShot(true);
+        player.setHspeed(5);
+        player.setVspeed(5);
         player.setControllable(true);
         player.setFocused(true);
-        player.setDoubleShot(true);
         addGuiElement(player);
         camera = new Camera(0, getWidth(), 0, getHeight(), MIN_X, MAX_X - MIN_X, MIN_Y, MAX_Y - MIN_Y);
 
@@ -128,39 +151,40 @@ public class GurpusUI extends JPanel {
     private void addMenu(boolean display) {
         CopyOnWriteArrayList<MenuItem> menuItems = new CopyOnWriteArrayList<>();
         menuItems.add(new MenuItem(
-                new Point2D.Double(getPreferredSize().getWidth() / 2 - 200 * SCALING, getPreferredSize().getHeight() / 4),
+                new Point2D.Double(getWidth() / 2 - 200 * SCALING, getHeight() / 4),
                 new Dimension(400 * SCALING, 50 * SCALING),
                 Color.WHITE,
                 Color.RED,
                 "Play Game",
                 5.0));
         menuItems.add(new MenuItem(
-                new Point2D.Double(getPreferredSize().getWidth() / 2 - 200 * SCALING, getPreferredSize().getHeight() / 4 + 100),
+                new Point2D.Double(getWidth() / 2 - 200 * SCALING, getHeight() / 4 + 100),
                 new Dimension(400 * SCALING, 50 * SCALING),
                 Color.WHITE,
                 Color.RED,
                 "Options",
                 5.0));
         menuItems.add(new MenuItem(
-                new Point2D.Double(getPreferredSize().getWidth() / 2 - 200 * SCALING, getPreferredSize().getHeight() / 4 + 200),
+                new Point2D.Double(getWidth() / 2 - 200 * SCALING, getHeight() / 4 + 200),
                 new Dimension(400 * SCALING, 50 * SCALING),
                 Color.WHITE,
                 Color.RED,
                 "Controls",
                 5.0));
         menuItems.add(new MenuItem(
-                new Point2D.Double(getPreferredSize().getWidth() / 2 - 200 * SCALING, getPreferredSize().getHeight() / 4 + 300),
+                new Point2D.Double(getWidth() / 2 - 200 * SCALING, getHeight() / 4 + 300),
                 new Dimension(400 * SCALING, 50 * SCALING),
                 Color.WHITE,
                 Color.RED,
                 "Exit Game",
                 5.0));
         TextElement menuTitle = new TextElement(
-                new Point2D.Double(getPreferredSize().getWidth() / 3, getPreferredSize().getHeight() / 8),
+                new Point2D.Double(getWidth() / 3, getHeight() / 8),
                 Color.WHITE,
                 Color.BLACK,
                 "Gurpus Maximus",
-                24);
+                24,
+                true);
         addGuiElement(new Menu(menuTitle, menuItems, display));
     }
 

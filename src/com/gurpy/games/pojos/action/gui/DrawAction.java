@@ -8,6 +8,8 @@ import com.gurpy.games.pojos.entities.MenuItem;
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.RoundRectangle2D;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 
 public class DrawAction extends UIAction {
 
@@ -36,6 +38,7 @@ public class DrawAction extends UIAction {
                     player.getY() + player.getBorderThickness(),
                     player.getWidth() - 2 * player.getBorderThickness(),
                     player.getHeight() - 2 * player.getBorderThickness()));
+            drawPlayerHealthbar(player, g2d);
             return true;
         } else if (getOwner() instanceof TextElement) {
             TextElement textElem = (TextElement)getOwner();
@@ -75,7 +78,7 @@ public class DrawAction extends UIAction {
         } else if (getOwner() instanceof Laser) {
             Laser item = (Laser)getOwner();
             for (int i = 0; i < item.getLines().size(); i++) {
-                if (i != 0 && i != item.getLines().size() - 1) {
+                if (i >= item.getLines().size() * .2 && i <= item.getLines().size() * .7) {
                     g2d.setColor(item.getBgColor());
                 } else {
                     g2d.setColor(item.getBorderColor());
@@ -86,6 +89,32 @@ public class DrawAction extends UIAction {
         } else {
             return false;
         }
+    }
+
+    private void drawPlayerHealthbar(BBoxPlayer player, Graphics2D g2d) {
+        Rectangle2D.Double healthBar = player.getHealthBar();
+        g2d.setColor(player.getHealthBarBorder());
+        g2d.fill(healthBar);
+        g2d.setColor(player.getHealthBarFillColor());
+        Rectangle2D.Double fillRect = player.getHealthBarFill();
+        g2d.fill(fillRect);
+        fillRect.setRect(fillRect.getX(), fillRect.getY(),
+                fillRect.getWidth() * (player.getHealth() / player.getMaxHealth()),
+                fillRect.getHeight());
+        g2d.setColor(player.getHealthBarColor());
+        g2d.fill(fillRect);
+        g2d.setColor(Color.BLACK);
+        Font tr = new Font("TimesRoman", Font.PLAIN, 12);
+        g2d.setFont(tr);
+        FontMetrics fontMetrics = g2d.getFontMetrics();
+        NumberFormat formatter = new DecimalFormat("#0.00");
+        String healthString = formatter.format(player.getHealth()) + " / " + formatter.format(player.getMaxHealth());
+        double textWidth = fontMetrics.stringWidth(healthString);
+        double textHeight = fontMetrics.getHeight();
+        g2d.drawString(healthString,
+                (float)(healthBar.getX() + healthBar.getWidth() / 2 - textWidth / 2),
+                (float)(healthBar.getY() + healthBar.getHeight() + textHeight + 2));
+
     }
 
     private void drawMenuItem(Graphics2D g2d, MenuItem item, Color borderColor, Color bgColor) {
