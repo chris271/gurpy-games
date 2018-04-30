@@ -6,6 +6,7 @@ import com.gurpy.games.obj.control.spawner.BBoxSpawner;
 import com.gurpy.games.obj.control.spawner.Spawner;
 import com.gurpy.games.obj.entities.Entity;
 import com.gurpy.games.obj.entities.ui.UIElement;
+import com.gurpy.games.obj.entities.ui.UIEntity;
 import com.sun.corba.se.impl.io.TypeMismatchException;
 
 public class StepSpawnerAction implements Action {
@@ -21,13 +22,13 @@ public class StepSpawnerAction implements Action {
     }
 
     @Override
-    public Entity getOwner() {
+    public UIEntity getOwner() {
         return spawner;
     }
 
     @Override
-    public void setOwner(Entity owner) {
-        if (owner instanceof BBoxSpawner) {
+    public void setOwner(UIEntity owner) {
+        if (owner instanceof Spawner) {
             this.spawner = (BBoxSpawner)getOwner();
         } else {
             throw new TypeMismatchException("Entity not a type of Spawner.");
@@ -39,7 +40,7 @@ public class StepSpawnerAction implements Action {
         if (getOwner() instanceof BBoxSpawner) {
             BBoxSpawner spawner = (BBoxSpawner)getOwner();
             if (spawner.randomSpawn(chance)) {
-                UIElement elementToSpawn = spawner.nextElement();
+                UIEntity elementToSpawn = spawner.nextElement();
                 elementToSpawn.setPosition(spawner.randomLocation());
                 return new SpawnAction(elementToSpawn, contentPane).perform();
             } else {

@@ -7,6 +7,7 @@ import com.gurpy.games.obj.action.UIAction;
 import com.gurpy.games.obj.control.movement.Direction;
 import com.gurpy.games.obj.entities.bbox.playable.BBoxPlayer;
 import com.gurpy.games.obj.entities.Entity;
+import com.gurpy.games.obj.entities.ui.UIEntity;
 import com.gurpy.games.utils.UtilFunctions;
 
 import java.awt.event.KeyEvent;
@@ -16,7 +17,7 @@ public class PlayerShootingInputAction extends UIAction {
 
     private GurpusUI contentPane;
 
-    public PlayerShootingInputAction(Entity owner, GurpusUI contentPane) {
+    public PlayerShootingInputAction(UIEntity owner, GurpusUI contentPane) {
         super(owner);
         this.contentPane = contentPane;
     }
@@ -80,11 +81,11 @@ public class PlayerShootingInputAction extends UIAction {
 
             }
 
-            if (player.getStepsSinceShot() < (GurpusCore.STEPS_PER_SEC / player.getFireRate())) {
-                player.setStepsSinceShot(player.getStepsSinceShot() + 1);
+            if (player.getWeapon().getStepsSinceShot() < (GurpusCore.STEPS_PER_SEC / player.getWeapon().getFireRate())) {
+                player.getWeapon().setStepsSinceShot(player.getWeapon().getStepsSinceShot() + 1);
             }
-            if (shootDir > -1 && player.getStepsSinceShot() > (GurpusCore.STEPS_PER_SEC / player.getFireRate()) - 1) {
-                player.setStepsSinceShot(0);
+            if (shootDir > -1 && player.getWeapon().getStepsSinceShot() > (GurpusCore.STEPS_PER_SEC / player.getWeapon().getFireRate()) - 1) {
+                player.getWeapon().setStepsSinceShot(0);
                 return new ShootAction(player, contentPane, shootDir).perform();
             }
 

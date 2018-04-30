@@ -4,6 +4,7 @@ import com.gurpy.games.obj.entities.EntityTypes;
 import com.gurpy.games.obj.entities.ui.UIElement;
 import com.gurpy.games.obj.entities.text.TextElement;
 
+import java.awt.*;
 import java.awt.geom.Point2D;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -14,7 +15,7 @@ public final class Menu extends UIElement {
     private int selectedItem;
 
     public Menu(TextElement title, CopyOnWriteArrayList<MenuItem> menuItems, boolean display) {
-        super(new Point2D.Double(0, 0), EntityTypes.MENU);
+        super(new Point2D.Double(0, 0), new Dimension(0, 0), EntityTypes.MENU);
         this.title = title;
         this.menuItems = menuItems;
         setDisplay(display);

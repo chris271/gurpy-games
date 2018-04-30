@@ -10,6 +10,6 @@ public final class EntityTypes {
     public static final int TEXT = 6;
     public static final int MENU_ITEM = 7;
     public static final int MENU = 8;
-    public static final int LASER = 9;
+    public static final int PROJECTILE = 9;
     public static final int WEAPON = 10;
 }

@@ -10,7 +10,7 @@ import com.gurpy.games.obj.action.input.PlayerMotionInputAction;
 import com.gurpy.games.obj.action.input.PlayerShootingInputAction;
 import com.gurpy.games.obj.action.movement.TranslationAction;
 import com.gurpy.games.obj.action.movement.UpdateAIAction;
-import com.gurpy.games.obj.action.movement.UpdateLaserAction;
+import com.gurpy.games.obj.action.movement.UpdateProjectileAction;
 import com.gurpy.games.obj.component.ControlComponent;
 import com.gurpy.games.obj.component.InputComponent;
 import com.gurpy.games.obj.component.PhysicsComponent;
@@ -25,7 +25,7 @@ import com.gurpy.games.obj.entities.line.weapon.Laser;
 import com.gurpy.games.obj.entities.menu.MenuItem;
 import com.gurpy.games.obj.entities.text.TextElement;
 import com.gurpy.games.obj.entities.ui.Playable;
-import com.gurpy.games.obj.entities.ui.UIElement;
+import com.gurpy.games.obj.entities.ui.UIEntity;
 import com.gurpy.games.utils.Logger;
 
 import java.awt.*;
@@ -78,7 +78,7 @@ public class GurpusCore implements Runnable{
 
     private void updateCurrentState() {
         //Iterate over each element.
-        for (UIElement e : contentPane.getGuiElements()) {
+        for (UIEntity e : contentPane.getGuiElements()) {
             //Check if element is marked for destruction.
             if (e.isDestroy()) {
                 if (e.equals(mainPlayer)) {
@@ -116,7 +116,7 @@ public class GurpusCore implements Runnable{
                     Laser laser = (Laser) e;
                     if (!isMenu) {
                         laser.setDisplay(true);
-                        physicsComponent.performAction(new UpdateLaserAction(laser, contentPane));
+                        physicsComponent.performAction(new UpdateProjectileAction(laser, contentPane));
                     } else {
                         laser.setDisplay(false);
                     }
@@ -168,7 +168,7 @@ public class GurpusCore implements Runnable{
                 }
 
                 //Check collisions
-                for (UIElement other : contentPane.getGuiElements()) {
+                for (UIEntity other : contentPane.getGuiElements()) {
                     if (!other.equals(e) && !other.isDestroy() && !e.isDestroy()) {
                         controlComponent.performAction(new CollisionCheckAction(e, other));
                     }
@@ -195,7 +195,7 @@ public class GurpusCore implements Runnable{
     private void detectWindowChanges() {
         //On window resize update element draw positions...
         if (contentPane.getCurrentWidth() != contentPane.getWidth() || contentPane.getCurrentHeight() != contentPane.getHeight()) {
-            for (UIElement e : contentPane.getGuiElements()) {
+            for (UIEntity e : contentPane.getGuiElements()) {
                 if (!(e instanceof TextElement && ((TextElement)e).isStaticText())) {
                     physicsComponent.performAction(new TranslationAction(e, new Point2D.Double(
                         e.getX() + (contentPane.getWidth() - contentPane.getCurrentWidth()) / 2.0,

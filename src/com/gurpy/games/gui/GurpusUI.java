@@ -10,6 +10,7 @@ import com.gurpy.games.obj.entities.bbox.menu.BBoxMenuItem;
 import com.gurpy.games.obj.entities.bbox.playable.BBoxPlayer;
 import com.gurpy.games.obj.entities.text.TextElement;
 import com.gurpy.games.obj.entities.ui.UIElement;
+import com.gurpy.games.obj.entities.ui.UIEntity;
 
 
 import javax.swing.*;
@@ -34,7 +35,7 @@ public class GurpusUI extends JPanel {
     private volatile int currentWidth = 0;
     private volatile int currentHeight = 0;
     private volatile int fps = 0;
-    private CopyOnWriteArrayList<UIElement> guiElements = new CopyOnWriteArrayList<>();
+    private CopyOnWriteArrayList<UIEntity> guiElements = new CopyOnWriteArrayList<>();
     private CopyOnWriteArrayList<Integer> keyCodes = new CopyOnWriteArrayList<>();
     private UIMouseListener uiMouseListener;
     private RenderingComponent renderingComponent;
@@ -125,13 +126,13 @@ public class GurpusUI extends JPanel {
                 5);
         player.getWeapon().setBgColor(Color.GREEN);
         player.getWeapon().setBorderColor(Color.YELLOW.darker().darker());
-        player.setNumBullets(3);
-        player.setBulletHeight(50);
-        player.setBulletWidth(20);
-        player.setShotSpeed(50);
-        player.setFireRate(25);
-        player.setRange(1);
-        player.setDoubleShot(true);
+        player.getWeapon().setNumBullets(5);
+        player.getWeapon().setProjectileHeight(50);
+        player.getWeapon().setProjectileWidth(20);
+        player.getWeapon().setShotSpeed(50);
+        player.getWeapon().setFireRate(25);
+        player.getWeapon().setRange(1);
+        player.getWeapon().setDoubleShot(true);
         player.setHspeed(5);
         player.setVspeed(5);
         player.setControllable(true);
@@ -202,7 +203,7 @@ public class GurpusUI extends JPanel {
         super.paintComponent(g2d);
         //Iterate over the GUI in order to repaint changes.
         //Iterate through each UIElement.
-        for (UIElement uiElement : guiElements) {
+        for (UIEntity uiElement : guiElements) {
             if (uiElement.isDisplay())
                 renderingComponent.performAction(new DrawAction(uiElement, g2d));
         }
@@ -225,7 +226,7 @@ public class GurpusUI extends JPanel {
         start = System.nanoTime();
     }
 
-    public CopyOnWriteArrayList<UIElement> getGuiElements() {
+    public CopyOnWriteArrayList<UIEntity> getGuiElements() {
         return guiElements;
     }
 

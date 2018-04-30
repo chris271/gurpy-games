@@ -7,6 +7,7 @@ import com.gurpy.games.obj.entities.bbox.playable.BBoxPlayer;
 import com.gurpy.games.obj.entities.menu.Menu;
 import com.gurpy.games.obj.entities.text.TextElement;
 import com.gurpy.games.obj.entities.ui.UIElement;
+import com.gurpy.games.obj.entities.ui.UIEntity;
 
 import java.awt.geom.Point2D;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -14,31 +15,15 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class MoveFocusedAction extends UIAction {
 
     private Camera camera;
-    private CopyOnWriteArrayList<UIElement> guiElements;
+    private CopyOnWriteArrayList<UIEntity> guiElements;
     private double xAmount, yAmount;
 
-    public MoveFocusedAction(Entity owner, Camera camera, CopyOnWriteArrayList<UIElement> guiElements, double xAmount, double yAmount) {
+    public MoveFocusedAction(UIEntity owner, Camera camera, CopyOnWriteArrayList<UIEntity> guiElements, double xAmount, double yAmount) {
         super(owner);
         this.camera = camera;
         this.guiElements = guiElements;
         this.xAmount = xAmount;
         this.yAmount = yAmount;
-    }
-
-    public Camera getCamera() {
-        return camera;
-    }
-
-    public void setCamera(Camera camera) {
-        this.camera = camera;
-    }
-
-    public CopyOnWriteArrayList<UIElement> getGuiElements() {
-        return guiElements;
-    }
-
-    public void setGuiElements(CopyOnWriteArrayList<UIElement> guiElements) {
-        this.guiElements = guiElements;
     }
 
     @Override
@@ -50,7 +35,7 @@ public class MoveFocusedAction extends UIAction {
                 player.setRelativeX(player.getRelativeX() + xAmount);
                 if (player.getRelativeX() > camera.getOuterX1() + camera.getinnerW() / 2 &&
                         player.getRelativeX() < camera.getOuterX1() + camera.getouterW() - camera.getinnerW() / 2) {
-                    for (UIElement uiElement : guiElements) {
+                    for (UIEntity uiElement : guiElements) {
                         if ((uiElement instanceof TextElement && ((TextElement) uiElement).isStaticText()) || uiElement instanceof Menu)
                             continue;
                         if (!getOwner().equals(uiElement)) {
@@ -76,7 +61,7 @@ public class MoveFocusedAction extends UIAction {
                 player.setRelativeY(player.getRelativeY() + yAmount);
                 if (player.getRelativeY() > camera.getOuterY1() + camera.getinnerH() / 2 &&
                         player.getRelativeY() < camera.getOuterY1() + camera.getouterH() - camera.getinnerH() / 2) {
-                    for (UIElement uiElement : guiElements) {
+                    for (UIEntity uiElement : guiElements) {
                         if ((uiElement instanceof TextElement && ((TextElement) uiElement).isStaticText()) || uiElement instanceof Menu)
                             continue;
                         if (!getOwner().equals(uiElement)) {

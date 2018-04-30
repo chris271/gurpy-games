@@ -15,20 +15,12 @@ public class BBoxPlayer extends BBoxElement implements Playable {
 
     private boolean controllable;
     private boolean focused;
-    private boolean doubleShot;
     private double hspeed;
     private double vspeed;
-    private double fireRate;
-    private double range;
-    private double shotSpeed;
-    private double bulletWidth;
-    private double bulletHeight;
     private double direction;
     private double health;
     private double maxHealth;
     private double score;
-    private int stepsSinceShot;
-    private int numBullets;
     private int killCount;
     private Weapon weapon;
     private Color healthBarColor;
@@ -47,18 +39,10 @@ public class BBoxPlayer extends BBoxElement implements Playable {
         this.hspeed = speed;
         this.vspeed = speed;
         this.direction = Direction.UP;
-        this.fireRate = 2;
-        this.range = 1;
-        this.bulletWidth = 10;
-        this.bulletHeight = 25;
-        this.shotSpeed = 20;
-        this.stepsSinceShot = 0;
-        this.numBullets = 1;
         this.controllable = false;
         this.focused = false;
         this.relativeX = position.getX();
         this.relativeY = position.getY();
-        this.doubleShot = false;
         this.health = 100;
         this.maxHealth = 100;
         this.healthBarBorder = Color.GREEN;
@@ -79,18 +63,10 @@ public class BBoxPlayer extends BBoxElement implements Playable {
         this.hspeed = speed;
         this.vspeed = speed;
         this.direction = Direction.UP;
-        this.fireRate = 2;
-        this.range = 1;
-        this.bulletWidth = 5;
-        this.bulletHeight = 25;
-        this.shotSpeed = 20;
-        this.stepsSinceShot = 0;
-        this.numBullets = 1;
         this.controllable = false;
         this.focused = false;
         this.relativeX = position.getX();
         this.relativeY = position.getY();
-        this.doubleShot = false;
         this.healthBarBorder = Color.GREEN;
         this.healthBarColor = Color.GREEN;
         this.healthBarFillColor = Color.RED;
@@ -109,18 +85,10 @@ public class BBoxPlayer extends BBoxElement implements Playable {
         this.hspeed = 1;
         this.vspeed = 1;
         this.direction = Direction.UP;
-        this.fireRate = 2;
-        this.range = 1;
-        this.bulletWidth = 5;
-        this.bulletHeight = 25;
-        this.shotSpeed = 20 ;
-        this.stepsSinceShot = 0;
-        this.numBullets = 1;
         this.controllable = false;
         this.focused = false;
         this.relativeX = position.getX();
         this.relativeY = position.getY();
-        this.doubleShot = false;
         this.healthBarBorder = Color.GREEN;
         this.healthBarColor = Color.GREEN;
         this.healthBarFillColor = Color.RED;
@@ -168,76 +136,6 @@ public class BBoxPlayer extends BBoxElement implements Playable {
     }
 
     @Override
-    public double getFireRate() {
-        return fireRate;
-    }
-
-    @Override
-    public void setFireRate(double fireRate) {
-        this.fireRate = fireRate;
-    }
-
-    @Override
-    public double getRange() {
-        return range;
-    }
-
-    @Override
-    public void setRange(double range) {
-        this.range = range;
-    }
-
-    @Override
-    public double getShotSpeed() {
-        return shotSpeed;
-    }
-
-    @Override
-    public void setShotSpeed(double shotSpeed) {
-        this.shotSpeed = shotSpeed;
-    }
-
-    @Override
-    public double getBulletWidth() {
-        return bulletWidth;
-    }
-
-    @Override
-    public void setBulletWidth(double bulletWidth) {
-        this.bulletWidth = bulletWidth;
-    }
-
-    @Override
-    public double getBulletHeight() {
-        return bulletHeight;
-    }
-
-    @Override
-    public void setBulletHeight(double bulletHeight) {
-        this.bulletHeight = bulletHeight;
-    }
-
-    @Override
-    public int getStepsSinceShot() {
-        return stepsSinceShot;
-    }
-
-    @Override
-    public void setStepsSinceShot(int stepsSinceShot) {
-        this.stepsSinceShot = stepsSinceShot;
-    }
-
-    @Override
-    public int getNumBullets() {
-        return numBullets;
-    }
-
-    @Override
-    public void setNumBullets(int numBullets) {
-        this.numBullets = numBullets;
-    }
-
-    @Override
     public boolean isControllable() {
         return controllable;
     }
@@ -275,16 +173,6 @@ public class BBoxPlayer extends BBoxElement implements Playable {
     @Override
     public void setRelativeY(double relativeY) {
         this.relativeY = relativeY;
-    }
-
-    @Override
-    public boolean isDoubleShot() {
-        return doubleShot;
-    }
-
-    @Override
-    public void setDoubleShot(boolean doubleShot) {
-        this.doubleShot = doubleShot;
     }
 
     @Override

@@ -14,6 +14,7 @@ import java.awt.geom.Point2D;
 public abstract class UIElement implements UIEntity{
 
     private volatile double xLoc, yLoc;
+    private volatile double width, height;
     private volatile boolean display;
     private volatile boolean destroy;
     private double borderThickness;
@@ -21,62 +22,48 @@ public abstract class UIElement implements UIEntity{
     private Color borderColor;
     private Color bgColor;
 
-    /**
-     * Contructor used for custom UI element.
-     * @param position
-     * @param borderColor
-     * @param bgColor
-     * @param type
-     */
-    public UIElement(Point2D position, Color borderColor, Color bgColor, double borderThickness, int type){
+    public UIElement(Point2D position, Dimension dimension, Color borderColor, Color bgColor, double borderThickness, int type){
         this.xLoc = position.getX();
         this.yLoc = position.getY();
         this.borderColor = borderColor;
         this.bgColor = bgColor;
         this.type = type;
         this.borderThickness = borderThickness;
+        this.width = dimension.getWidth();
+        this.height = dimension.getHeight();
     }
 
-    /**
-     * Constructor used for solid color custom UI element
-     * @param position
-     * @param color
-     * @param type
-     */
-    public UIElement(Point2D position, Color color, int type){
+    public UIElement(Point2D position, Dimension dimension, Color color, int type){
         this.xLoc = position.getX();
         this.yLoc = position.getY();
         this.borderColor = color;
         this.bgColor = color;
         this.type = type;
         this.borderThickness = 0.0;
+        this.width = dimension.getWidth();
+        this.height = dimension.getHeight();
     }
 
-    /**
-     * Constructor used for custom black UI element.
-     * @param position
-     * @param type
-     */
-    public UIElement(Point2D position, int type){
+    public UIElement(Point2D position, Dimension dimension, int type){
         this.xLoc = position.getX();
         this.yLoc = position.getY();
         this.borderColor = Color.BLACK;
         this.bgColor = Color.BLACK;
         this.type = type;
         this.borderThickness = 0.0;
+        this.width = dimension.getWidth();
+        this.height = dimension.getHeight();
     }
 
-    /**
-     * Constructor used for generic black UI element.
-     * @param position
-     */
-    public UIElement(Point2D position){
+    public UIElement(Point2D position, Dimension dimension){
         this.xLoc = position.getX();
         this.yLoc = position.getY();
         this.borderColor = Color.BLACK;
         this.bgColor = Color.BLACK;
         this.type = EntityTypes.DEFAULT;
         this.borderThickness = 0.0;
+        this.width = dimension.getWidth();
+        this.height = dimension.getHeight();
     }
 
     @Override
@@ -140,35 +127,63 @@ public abstract class UIElement implements UIEntity{
         this.display = display;
     }
 
+    @Override
     public Color getBorderColor() {
         return borderColor;
     }
 
+    @Override
     public void setBorderColor(Color borderColor) {
         this.borderColor = borderColor;
     }
 
+    @Override
     public Color getBgColor() {
         return bgColor;
     }
 
+    @Override
     public void setBgColor(Color bgColor) {
         this.bgColor = bgColor;
     }
 
+    @Override
     public double getBorderThickness() {
         return borderThickness;
     }
 
+    @Override
     public void setBorderThickness(double borderThickness) {
         this.borderThickness = borderThickness;
     }
 
+    @Override
     public boolean isDestroy() {
         return destroy;
     }
 
+    @Override
     public void setDestroy(boolean destroy) {
         this.destroy = destroy;
+    }
+
+    @Override
+    public double getWidth() {
+        return width;
+    }
+
+    @Override
+    public double getHeight() {
+        return height;
+    }
+
+    @Override
+    public void setWidth(double width) {
+        this.width = width;
+    }
+
+    @Override
+    public void setHeight(double height) {
+        this.height = height;
     }
 }

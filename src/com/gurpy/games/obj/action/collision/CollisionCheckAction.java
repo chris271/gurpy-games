@@ -5,7 +5,9 @@ import com.gurpy.games.obj.entities.bbox.BBoxElement;
 import com.gurpy.games.obj.entities.bbox.playable.BBoxEnemy;
 import com.gurpy.games.obj.entities.line.LineElement;
 import com.gurpy.games.obj.entities.line.weapon.Laser;
+import com.gurpy.games.obj.entities.ui.Enemy;
 import com.gurpy.games.obj.entities.ui.Playable;
+import com.gurpy.games.obj.entities.ui.Projectile;
 import com.gurpy.games.obj.entities.ui.UIEntity;
 
 import java.awt.geom.Line2D;
@@ -56,21 +58,37 @@ public class CollisionCheckAction extends UIAction {
     private void doCollision() {
         if (getOwner() instanceof Playable) {
             Playable player = (Playable)getOwner();
-            if (other instanceof Laser) {
-                Playable laserOwner = ((Laser)other).getOwner();
-                if (!(player.equals(laserOwner))) {
+            if (other instanceof Projectile) {
+                Playable projOwner = ((Projectile)other).getOwner();
+                if (!(player.equals(projOwner))) {
                     if (player.getHealth() > 0) {
                         player.setHealth(player.getHealth() - .1);
                     } else {
                         player.setDestroy(true);
-                        laserOwner.setKillCount(laserOwner.getKillCount() + 1);
-                        laserOwner.setScore(laserOwner.getScore() + player.getScore());
+                        projOwner.setKillCount(projOwner.getKillCount() + 1);
+                        projOwner.setScore(projOwner.getScore() + player.getScore());
                     }
                 }
 
-            } else if (other instanceof BBoxEnemy) {
-                if (player.isControllable()) {
-                    player.setHealth(player.getHealth() - .1);
+            } else if (other instanceof Enemy) {
+                Enemy enemy = (Enemy)other;
+                if (!(player instanceof Enemy)) {
+                    if (player.getHealth() > 0) {
+                        player.setHealth(player.getHealth() - .1);
+                    } else {
+                        player.setDestroy(true);
+                        enemy.setKillCount(enemy.getKillCount() + 1);
+                        enemy.setScore(enemy.getScore() + player.getScore());
+                    }
+                }
+            }
+        } else if (getOwner() instanceof Projectile) {
+            Projectile projectile = (Projectile)getOwner();
+            if (other instanceof Projectile) {
+                projectile.setDestroy(true);
+            } else if (other instanceof Playable) {
+                if (!(projectile instanceof Laser)) {
+                    projectile.setDestroy(true);
                 }
             }
         }

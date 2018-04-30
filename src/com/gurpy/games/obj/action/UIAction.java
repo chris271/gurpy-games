@@ -1,22 +1,22 @@
 package com.gurpy.games.obj.action;
 
-import com.gurpy.games.obj.entities.Entity;
+import com.gurpy.games.obj.entities.ui.UIEntity;
 
 public abstract class UIAction implements Action {
 
-    private Entity owner;
+    private UIEntity owner;
 
-    public UIAction(Entity owner) {
+    public UIAction(UIEntity owner) {
         this.owner = owner;
     }
 
     @Override
-    public Entity getOwner() {
+    public UIEntity getOwner() {
         return owner;
     }
 
     @Override
-    public void setOwner(Entity owner) {
+    public void setOwner(UIEntity owner) {
         this.owner = owner;
     }
 

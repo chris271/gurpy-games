@@ -6,6 +6,7 @@ import com.gurpy.games.obj.action.movement.MoveFocusedAction;
 import com.gurpy.games.obj.control.movement.Direction;
 import com.gurpy.games.obj.entities.bbox.playable.BBoxPlayer;
 import com.gurpy.games.obj.entities.Entity;
+import com.gurpy.games.obj.entities.ui.UIEntity;
 
 import java.awt.event.KeyEvent;
 
@@ -13,7 +14,7 @@ public class PlayerMotionInputAction extends UIAction {
 
     private GurpusUI contentPane;
 
-    public PlayerMotionInputAction(Entity owner, GurpusUI contentPane) {
+    public PlayerMotionInputAction(UIEntity owner, GurpusUI contentPane) {
         super(owner);
         this.contentPane = contentPane;
     }

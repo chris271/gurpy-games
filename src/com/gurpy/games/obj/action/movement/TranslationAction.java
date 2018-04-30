@@ -6,7 +6,7 @@ import com.gurpy.games.obj.entities.line.LineElement;
 import com.gurpy.games.obj.entities.line.weapon.Laser;
 import com.gurpy.games.obj.entities.menu.Menu;
 import com.gurpy.games.obj.entities.text.TextElement;
-import com.gurpy.games.obj.entities.ui.UIElement;
+import com.gurpy.games.obj.entities.ui.UIEntity;
 
 import java.awt.geom.Point2D;
 
@@ -14,7 +14,7 @@ public class TranslationAction extends UIAction {
 
     private Point2D.Double newPos;
 
-    public TranslationAction(UIElement owner, Point2D.Double newPos) {
+    public TranslationAction(UIEntity owner, Point2D.Double newPos) {
         super(owner);
         this.newPos = newPos;
     }

@@ -1,11 +1,12 @@
 package com.gurpy.games.obj.entities.bbox.playable;
 
 import com.gurpy.games.obj.entities.EntityTypes;
+import com.gurpy.games.obj.entities.ui.Enemy;
 
 import java.awt.*;
 import java.awt.geom.Point2D;
 
-public class BBoxEnemy extends BBoxPlayer {
+public class BBoxEnemy extends BBoxPlayer implements Enemy {
 
     private int enemyType;
 
@@ -32,10 +33,12 @@ public class BBoxEnemy extends BBoxPlayer {
         setType(EntityTypes.ENEMY);
     }
 
+    @Override
     public int getEnemyType() {
         return enemyType;
     }
 
+    @Override
     public void setEnemyType(int enemyType) {
         this.enemyType = enemyType;
     }
