@@ -47,9 +47,9 @@ public class GurpusCore implements Runnable{
 
     GurpusCore(GurpusUI contentPane) {
         this.contentPane = contentPane;
-        this.physicsComponent = new PhysicsComponent();
-        this.controlComponent = new ControlComponent();
-        this.inputComponent = new InputComponent();
+        this.physicsComponent = PhysicsComponent.getInstance();
+        this.controlComponent = ControlComponent.getInstance();
+        this.inputComponent = InputComponent.getInstance();
         mainPlayer = new BBoxPlayer(new Point2D.Double(0, 0), new Dimension(0, 0));
     }
 
@@ -187,7 +187,10 @@ public class GurpusCore implements Runnable{
             contentPane.resetGame();
         }
 
-        stepSpawner();
+        if (!isMenu) {
+            stepSpawner();
+        }
+
         detectWindowChanges();
 
     }

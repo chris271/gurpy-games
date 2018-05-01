@@ -47,14 +47,6 @@ public class CollisionCheckAction extends UIAction {
         return false;
     }
 
-    public UIEntity getOther() {
-        return other;
-    }
-
-    public void setOther(UIEntity other) {
-        this.other = other;
-    }
-
     private void doCollision() {
         if (getOwner() instanceof Playable) {
             Playable player = (Playable)getOwner();

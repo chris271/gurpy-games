@@ -90,7 +90,7 @@ public class GurpusUI extends JPanel {
         });
 
         camera = new Camera(0, getWidth(), 0, getHeight(), MIN_X, MAX_X - MIN_X, MIN_Y, MAX_Y - MIN_Y);
-        renderingComponent = new RenderingComponent();
+        renderingComponent = RenderingComponent.getInstance();
         lastFrameTime = System.nanoTime();
         addMenu(true);
 
